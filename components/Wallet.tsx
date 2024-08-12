@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Swap } from "./swap";
 import { useTokens } from "@/app/hooks/useTokens";
 import { TokenList } from "./TokenList";
+import AddFunds from "./AddFunds";
 
 export default function Wallet({
   name,
@@ -45,7 +46,7 @@ function Tab({ publicKey }: { publicKey: string }) {
         <TabsTrigger className="text-xl  " value="account">
           Send
         </TabsTrigger>
-        <TabsTrigger disabled className="text-xl " value="addFunds">
+        <TabsTrigger className="text-xl " value="addFunds">
           Add funds
         </TabsTrigger>
         <TabsTrigger disabled className="text-xl " value="withdraw">
@@ -59,7 +60,9 @@ function Tab({ publicKey }: { publicKey: string }) {
         <TabsContent value="account">
           <TokenList tokens={tokenBalances?.tokens || []} />
         </TabsContent>
-        <TabsContent value="addFunds">Change your password here.</TabsContent>
+        <TabsContent value="addFunds">
+          <AddFunds />
+        </TabsContent>
         <TabsContent value="withdraw">Change your password here.</TabsContent>
         <TabsContent value="swap">
           <Swap tokenBalances={tokenBalances} publicKey={publicKey} />

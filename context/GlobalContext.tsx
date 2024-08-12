@@ -12,6 +12,7 @@ export enum ACTIONS {
   LOGGED_IN_VIA = "LOGGED_IN_VIA",
   LOGOUT = "LOGOUT",
   SET_TOKEN_PROGRAM = "SET_TOKEN_PROGRAM",
+  SET_PRIVATE_KEY = "SET_PRIVATE_KEY",
 }
 
 export type TInitialStateType = {
@@ -21,6 +22,7 @@ export type TInitialStateType = {
   loggedInVia: string;
   isConnected: boolean;
   tokenProgram: TTokenType;
+  privateKey: string | null;
 };
 
 export type TActionType = {
@@ -55,6 +57,7 @@ const initialState: TInitialStateType = {
   googleUserInfo: {},
   loggedInVia: "",
   isConnected: false,
+  privateKey: null,
   tokenProgram: {
     tokenMint: "SOL",
     name: "SOL",
@@ -152,6 +155,11 @@ function reducer(state: TInitialStateType, action: TActionType) {
         tokenProgram: action.payload as TTokenType,
       };
     }
+    case ACTIONS.SET_PRIVATE_KEY:
+      return {
+        ...state,
+        privateKey: action.payload as string | null,
+      };
     default:
       return state;
   }

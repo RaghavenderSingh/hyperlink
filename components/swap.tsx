@@ -166,11 +166,7 @@ function SwapInputRow({
     >
       <div>
         <div className="text-xs font-semibold mb-1">{title}</div>
-        <TokenListDialog
-          selectedToken={selectedToken}
-          onSelect={onSelect}
-          tokenList={tokenList}
-        />
+        <TokenListDialog selectedToken={selectedToken} onSelect={onSelect} />
         {subtitle}
       </div>
       <div>

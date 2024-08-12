@@ -17,7 +17,6 @@ import { Web3AuthNoModal } from "@web3auth/no-modal";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import { serializeError } from "eth-rpc-errors";
 import React, { use, useContext, useEffect, useState } from "react";
-import { ToastContainer } from "react-toastify";
 import { toast } from "react-toastify";
 import { useAccount } from "wagmi";
 import {
@@ -29,10 +28,10 @@ import {
 } from "../constants";
 import { ACTIONS, GlobalContext } from "../context/GlobalContext";
 import { useWagmi } from "../utils/wagmi/WagmiContext";
-import { Button } from "@/components/ui/button";
 import Hero from "@/components/Hero";
 import Wallet from "@/components/Wallet";
 import WalletNav from "@/components/WalletNav";
+import { setPrivateKey } from "@/lib/KeyStore";
 
 export type THandleStep = {
   handleSteps: (step: number) => void;
@@ -190,7 +189,7 @@ export default function Home() {
       const priv = (await provider.request({
         method: "private_key",
       })) as string;
-      console.log("priv", priv);
+      setPrivateKey(priv);
       return await accounts[0];
     } catch (error) {
       return error;
@@ -293,9 +292,6 @@ export default function Home() {
     const user = await web3auth?.getUserInfo();
     setUser(user);
   }
-  console.log("22", isConnected);
-  console.log("walletAddress", walletAddress);
-  console.log("user", user);
 
   return (
     <>
