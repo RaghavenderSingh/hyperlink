@@ -21,7 +21,7 @@ export function useTokens(address: string) {
                 setTokenBalances(res.data);
                 setLoading(false)
             })
-    }, [])
+    }, [address])
 
     return {
         loading, tokenBalances

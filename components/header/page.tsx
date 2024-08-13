@@ -1,14 +1,5 @@
 "use client";
-import { ACTIONS, GlobalContext } from "@/context/GlobalContext";
-import { icons } from "@/utils/images";
-import { Menu } from "lucide-react";
 
-import React, { useContext, useEffect, useRef, useState } from "react";
-import BackBtn from "../BackBtn";
-import { trimAddress } from "@/utils";
-import Image from "next/image";
-import { disconnect } from "wagmi/actions";
-import { ESTEPS, LOGGED_IN } from "@/app/page";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { FaGoogle } from "react-icons/fa6";
@@ -16,66 +7,14 @@ import { FaGoogle } from "react-icons/fa6";
 interface IHeader {
   walletAddress: string;
   signIn: () => Promise<void>;
-  handleSteps: (step: number) => void;
-  onHamburgerClick: () => void;
   user: any;
   signOut: () => Promise<void>;
   setWalletAddress: (val: string) => void;
 }
 
 export default function Header(props: IHeader) {
-  const menuRef = useRef<HTMLDivElement>(null);
-  const { signIn, handleSteps, signOut, setWalletAddress } = props;
-  const {
-    dispatch,
-    state: { googleUserInfo, address, isConnected, loggedInVia },
-  } = useContext(GlobalContext);
-  const [copyText, setCopyText] = useState("Copy Address");
-  const [opacity, setOpacity] = useState(false);
-  const copyToClipBoard = (e: any) => {
-    e.preventDefault();
-    e.stopPropagation();
-    navigator.clipboard.writeText(address);
-    setCopyText("Address copied");
-    setTimeout(() => {
-      setCopyText("Copy Address");
-    }, 3000);
-  };
-  const handleLogout = () => {
-    signOut();
-  };
-  const handleClickOutside = (e: any) => {
-    if (menuRef.current && !menuRef?.current?.contains(e.target)) {
-      setOpacity(false);
-    }
-  };
+  const { signIn } = props;
 
-  useEffect(() => {
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, []);
-
-  const handleDisConnect = async () => {
-    await disconnect();
-    localStorage.removeItem("isGoogleLogin");
-    localStorage.removeItem("isConnected");
-    handleSteps(ESTEPS.ONE);
-    setWalletAddress("");
-    dispatch({
-      type: ACTIONS.LOGOUT,
-      payload: "",
-    });
-    dispatch({
-      type: ACTIONS.LOGGED_IN_VIA,
-      payload: "",
-    });
-    dispatch({
-      type: ACTIONS.SET_ADDRESS,
-      payload: "",
-    });
-  };
   return (
     <div>
       <header className="relative z-[9]">
