@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { AlignJustify, Wallet } from "lucide-react";
 import { SheetDemo } from "./DrawerNav";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 export default function WalletNav({
   profileImage,
@@ -18,9 +19,11 @@ export default function WalletNav({
       <div></div>
       <div>
         <div className="flex justify-between gap-2">
-          <Button>
+          <WalletMultiButton
+            style={{ backgroundColor: "black", height: "40px" }}
+          >
             <Wallet />
-          </Button>
+          </WalletMultiButton>
 
           <SheetDemo profileImage={profileImage} signOut={signOut} />
         </div>

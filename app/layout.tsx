@@ -4,6 +4,7 @@ import "./globals.css";
 import GlobalContextProvider from "@/context/GlobalContext";
 import { SolanaWalletProvider } from "@/context/SolanaWalletContext";
 import { WagmiWrapper } from "@/utils/wagmi/WagmiContext";
+import AppWalletProvider from "@/components/AppWalletProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,7 +23,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <GlobalContextProvider>
           <WagmiWrapper>
-            <SolanaWalletProvider>{children}</SolanaWalletProvider>
+            <AppWalletProvider>
+              <SolanaWalletProvider>{children}</SolanaWalletProvider>
+            </AppWalletProvider>
           </WagmiWrapper>
         </GlobalContextProvider>
       </body>
