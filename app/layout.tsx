@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import GlobalContextProvider from "@/context/GlobalContext";
 import { SolanaWalletProvider } from "@/context/SolanaWalletContext";
 import { WagmiWrapper } from "@/utils/wagmi/WagmiContext";
 import AppWalletProvider from "@/components/AppWalletProvider";
@@ -21,13 +20,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <GlobalContextProvider>
-          <WagmiWrapper>
-            <AppWalletProvider>
-              <SolanaWalletProvider>{children}</SolanaWalletProvider>
-            </AppWalletProvider>
-          </WagmiWrapper>
-        </GlobalContextProvider>
+        <WagmiWrapper>
+          <AppWalletProvider>
+            <SolanaWalletProvider>{children}</SolanaWalletProvider>
+          </AppWalletProvider>
+        </WagmiWrapper>
       </body>
     </html>
   );
