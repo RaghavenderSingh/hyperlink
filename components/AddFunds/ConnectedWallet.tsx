@@ -3,6 +3,10 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { ArrowLeft } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { Combobox } from "../Select";
+import { Input } from "../ui/input";
+import CustomTextField from "../CustomTextField";
+import { Button } from "../ui/button";
 
 type FundingOptionsProps = {
   setStep: (value: number) => void;
@@ -54,6 +58,29 @@ export default function ConnectedWallet({ setStep }: FundingOptionsProps) {
           <p className="pb-3 text-sm font-normal text-grey-700">
             Specify asset and amount:
           </p>
+        </div>
+        <div className="flex w-full flex-col justify-start space-y-5 xs:space-y-0 xs:flex-row xs:space-x-10">
+          <div>
+            <Combobox />
+          </div>
+          <div className="flex w-full items-center justify-center text-left text-sm font-normal text-grey-700 xs:text-base">
+            <span className="text-sm font-semibold text-grey-700 ">
+              Your available SOL:{" "}
+            </span>
+            <span className="text-sm font-bold text-grey-700">
+              {balance ? balance.toFixed(2) : "0.00"}
+              {" SOL"}
+            </span>
+          </div>
+          <div>
+            <div>
+              <CustomTextField />
+            </div>
+            <div className="flex justify-between mt-4">
+              <Button variant={"outline"}>Cancel</Button>
+              <Button>Deposit</Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
