@@ -2,7 +2,7 @@ import { PublicKey, Transaction, SystemProgram } from "@solana/web3.js";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useConnection } from "@solana/wallet-adapter-react";
 
-export const transferSOL = async (destinationAddress: string, amount: number) => {
+export const useTransferSOL = async (destinationAddress: string, amount: number) => {
     const { connection } = useConnection();
     const { publicKey, sendTransaction } = useWallet();
 
