@@ -38,10 +38,8 @@ export function Swap({
     setFetchingQuote(true);
     axios
       .get(
-        `https://quote-api.jup.ag/v6/quote?inputMint=${
-          baseAsset.mint
-        }&outputMint=${quoteAsset.mint}&amount=${
-          Number(baseAmount) * 10 ** baseAsset.decimals
+        `https://quote-api.jup.ag/v6/quote?inputMint=${baseAsset.mint
+        }&outputMint=${quoteAsset.mint}&amount=${Number(baseAmount) * 10 ** baseAsset.decimals
         }&slippageBps=50`
       )
       .then((res) => {
@@ -56,7 +54,7 @@ export function Swap({
   }, [baseAsset, quoteAsset, baseAmount]);
 
   return (
-    <div className="p-12 bg-slate-50">
+    <div className="pl-4 pt-12 pb-12 bg-slate-50">
       <div className="text-2xl font-bold pb-4">Swap Tokens</div>
       <SwapInputRow
         amount={baseAmount}
@@ -105,7 +103,7 @@ export function Swap({
           setQuoteAsset(asset);
         }}
         selectedToken={quoteAsset}
-        title={"You receive"}
+        title={"You receive:"}
         topBorderEnabled={false}
         bottomBorderEnabled={true}
       />
@@ -160,9 +158,8 @@ function SwapInputRow({
 }) {
   return (
     <div
-      className={`border flex justify-between p-6 ${
-        topBorderEnabled ? "rounded-t-xl" : ""
-      } ${bottomBorderEnabled ? "rounded-b-xl" : ""}`}
+      className={`border flex justify-between pl-6 pt-6 pb-6 ${topBorderEnabled ? "rounded-t-xl" : ""
+        } ${bottomBorderEnabled ? "rounded-b-xl" : ""}`}
     >
       <div>
         <div className="text-xs font-semibold mb-1">{title}</div>
