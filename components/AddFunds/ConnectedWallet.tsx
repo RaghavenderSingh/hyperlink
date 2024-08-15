@@ -7,6 +7,8 @@ import { Combobox } from "../Select";
 import { Input } from "../ui/input";
 import CustomTextField from "../CustomTextField";
 import { Button } from "../ui/button";
+import { useTransferSOL } from "@/app/hooks/useTransferSOL";
+import { getPublicKey } from "@/lib/KeyStore";
 
 type FundingOptionsProps = {
   setStep: (value: number) => void;
@@ -14,8 +16,10 @@ type FundingOptionsProps = {
 
 export default function ConnectedWallet({ setStep }: FundingOptionsProps) {
   const { publicKey, sendTransaction, wallets } = useWallet();
+  const { transferSOL, isTransferring, error } = useTransferSOL();
   const [balance, setBalance] = useState(0);
   const { connection } = useConnection();
+  const [amount, setAmount] = useState("");
   console.log("publicKey", publicKey);
   console.log("wallet", wallets);
   useEffect(() => {
@@ -38,7 +42,18 @@ export default function ConnectedWallet({ setStep }: FundingOptionsProps) {
       setBalance(info.lamports / LAMPORTS_PER_SOL);
     });
   }, [connection, publicKey]);
-  console.log("balance", balance);
+  const handleDeposit = async () => {
+    if (!publicKey) {
+      return;
+    }
+    const amt = Number(amount);
+
+    await transferSOL(getPublicKey(), amt);
+
+    setStep(0);
+  };
+  console.log("balance", balance, publicKey);
+  console.log("sss", isTransferring, error);
   return (
     <div>
       <div className="py-5">
@@ -74,11 +89,11 @@ export default function ConnectedWallet({ setStep }: FundingOptionsProps) {
           </div>
           <div>
             <div>
-              <CustomTextField />
+              <CustomTextField setAmount={setAmount} />
             </div>
             <div className="flex justify-between mt-4">
               <Button variant={"outline"}>Cancel</Button>
-              <Button>Deposit</Button>
+              <Button onClick={handleDeposit}>Deposit</Button>
             </div>
           </div>
         </div>

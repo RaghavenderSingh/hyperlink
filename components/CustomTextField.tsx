@@ -3,8 +3,11 @@ import axios from "axios";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 
 type QuickAmount = 1 | 2 | 5;
+type setAmountProps = {
+  setAmount: (value: string) => void;
+};
 
-const CustomTextField = () => {
+const CustomTextField = ({ setAmount }: { setAmount: any }) => {
   const [value, setValue] = useState<string>("");
   const [solValue, setSolValue] = useState<string>("0");
   const [cursorPosition, setCursorPosition] = useState<number>(0);
@@ -64,6 +67,7 @@ const CustomTextField = () => {
 
       const response = await fetch(url);
       const data = await response.json();
+      setAmount(data.outAmount);
       setSolValue((data.outAmount / LAMPORTS_PER_SOL).toFixed(4));
       console.log(data);
     } catch (error) {
