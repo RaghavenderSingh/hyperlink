@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Swap } from "./swap";
 import { useTokens } from "@/app/hooks/useTokens";
 import { TokenList } from "./TokenList";
-import AddFunds from "./AddFunds";
+import AddFunds from "./AddFunds/AddFunds";
 
 export default function Wallet({
   name,
@@ -40,6 +40,7 @@ function Greeting({ image, name }: { image: string; name: string }) {
 }
 function Tab({ publicKey }: { publicKey: string }) {
   const { tokenBalances, loading } = useTokens(publicKey);
+
   return (
     <Tabs defaultValue="account" className="w-full mt-5">
       <TabsList className="w-full justify-evenly p-6">
