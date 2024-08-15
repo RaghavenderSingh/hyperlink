@@ -167,17 +167,27 @@ function SwapInputRow({
         {subtitle}
       </div>
       <div>
-        <input
-          disabled={inputDisabled}
-          onChange={(e) => {
-            onAmountChange?.(e.target.value);
-          }}
-          placeholder="0"
-          type="text"
-          className="bg-slate-50 p-6 outline-none text-4xl"
-          dir="rtl"
-          value={inputLoading ? "Loading" : amount}
-        ></input>
+        <div className="relative">
+          <input
+            disabled={inputDisabled}
+            onChange={(e) => onAmountChange?.(e.target.value)}
+            placeholder="0"
+            type="text"
+            className={`bg-slate-50 p-6 outline-none text-4xl pr-12 ${inputLoading ? 'text-transparent' : ''}`}
+            dir="rtl"
+            value={amount}
+          />
+          {inputLoading && (
+            <div className="absolute inset-y-0 right-0 flex items-center pr-12">
+              <div className='flex space-x-1 justify-center items-center dark:invert'>
+                <span className='sr-only'>Loading...</span>
+                <div className='h-1.5 w-1.5 bg-black rounded-full animate-bounce [animation-delay:-0.3s]'></div>
+                <div className='h-1.5 w-1.5 bg-black rounded-full animate-bounce [animation-delay:-0.15s]'></div>
+                <div className='h-1.5 w-1.5 bg-black rounded-full animate-bounce'></div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
