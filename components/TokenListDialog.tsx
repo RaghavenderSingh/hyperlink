@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { SUPPORTED_TOKENS, TokenDetails } from "@/lib/tokens";
@@ -12,8 +12,10 @@ export function TokenListDialog({
 }) {
   const [localSelectedToken, setLocalSelectedToken] =
     useState<TokenDetails>(selectedToken);
+  useEffect(() => {
+    setLocalSelectedToken(selectedToken);
+  }, [selectedToken]);
   const [open, setOpen] = useState(false);
-  console.log(localSelectedToken)
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>

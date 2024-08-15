@@ -53,10 +53,17 @@ export function Swap({
       });
   }, [baseAsset, quoteAsset, baseAmount]);
 
+  const swapAssets = () => {
+    const temp = baseAsset;
+    setBaseAsset(quoteAsset);
+    setQuoteAsset(temp);
+  };
+
   return (
     <div className="pl-4 pt-12 pb-12 bg-slate-50">
       <div className="text-2xl font-bold pb-4">Swap Tokens</div>
       <SwapInputRow
+        tokenBalances={tokenBalances}
         amount={baseAmount}
         onAmountChange={(value: string) => {
           setBaseAmount(value);
@@ -84,11 +91,7 @@ export function Swap({
 
       <div className="flex justify-center">
         <div
-          onClick={() => {
-            let baseAssetTemp = baseAsset;
-            setBaseAsset(quoteAsset);
-            setQuoteAsset(baseAssetTemp);
-          }}
+          onClick={() => { swapAssets() }}
           className="cursor-pointer rounded-full w-10 h-10 border absolute mt-[-20px] bg-white flex justify-center pt-2"
         >
           <SwapIcon />
@@ -132,6 +135,7 @@ export function Swap({
 }
 
 function SwapInputRow({
+  tokenBalances,
   onSelect,
   amount,
   onAmountChange,
@@ -144,6 +148,10 @@ function SwapInputRow({
   inputLoading,
   tokenList,
 }: {
+  tokenBalances: {
+    totalBalance: number;
+    tokens: TokenWithbalance[];
+  } | null;
   onSelect: (asset: TokenDetails) => void;
   selectedToken: TokenDetails;
   title: string;
@@ -175,7 +183,7 @@ function SwapInputRow({
             type="text"
             className={`bg-slate-50 p-6 outline-none text-4xl pr-12 ${inputLoading ? 'text-transparent' : ''}`}
             dir="rtl"
-            value={amount}
+            value={amount + "xyz"}
           />
           {inputLoading && (
             <div className="absolute inset-y-0 right-0 flex items-center pr-12">
