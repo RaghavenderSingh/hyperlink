@@ -1,11 +1,34 @@
 import { TokenWithbalance } from "@/app/hooks/useTokens";
+import { Button } from "./ui/button";
 
-export function TokenList({ tokens }: { tokens: TokenWithbalance[] }) {
+
+export function TokenList({ tokens, navigator }: { tokens: TokenWithbalance[], navigator: (tabName: string) => void }) {
+  const validTokens = tokens.filter((t) => t.balance !== "0.00");
   return (
     <div>
-      {tokens.map((t) => (
-        <TokenRow key={t.name} token={t} />
-      ))}
+      {validTokens.length === 0 ? (
+        <div className="flex flex-col justify-center items-center">
+          <span className="font-bold text-2xl pt-4 pb-1">You don't have any assets yet!</span>
+          <span className="text-medium pb-4">Start by buying or depositing funds:</span>
+          <Button onClick={() => navigator('addFunds')}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4 mr-1"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Add Funds
+          </Button>
+
+        </div>
+      ) : (
+        validTokens.map((t) => (
+          <TokenRow key={t.name} token={t} />
+        ))
+      )}
     </div>
   );
 }

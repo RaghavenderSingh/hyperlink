@@ -17,7 +17,6 @@ export const useFetchTokens = () => {
   const [tokens, setTokens] = useState<TokenApiList[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  console.log("qwer");
   useEffect(() => {
     const fetchData = async () => {
       try {

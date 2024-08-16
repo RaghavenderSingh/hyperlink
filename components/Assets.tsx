@@ -19,7 +19,6 @@ export default function Assets({ publicKey }: { publicKey: string }) {
       };
     }
   }, [copied]);
-  console.log("122", tokenBalances);
   if (loading) {
     return "Loading...";
   }

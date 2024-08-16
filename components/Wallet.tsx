@@ -5,6 +5,7 @@ import { Swap } from "./swap";
 import { useTokens } from "@/app/hooks/useTokens";
 import { TokenList } from "./TokenList";
 import AddFunds from "./AddFunds";
+import { useState } from "react"
 
 export default function Wallet({
   name,
@@ -40,8 +41,9 @@ function Greeting({ image, name }: { image: string; name: string }) {
 }
 function Tab({ publicKey }: { publicKey: string }) {
   const { tokenBalances, loading } = useTokens(publicKey);
+  const [activeTab, setActiveTab] = useState('account');
   return (
-    <Tabs defaultValue="account" className="w-full mt-5">
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mt-5">
       <TabsList className="w-full justify-evenly p-6">
         <TabsTrigger className="text-xl  " value="account">
           Send
@@ -58,7 +60,7 @@ function Tab({ publicKey }: { publicKey: string }) {
       </TabsList>
       <div className="pt-0 bg-slate-50 p-12 mt-4">
         <TabsContent value="account">
-          <TokenList tokens={tokenBalances?.tokens || []} />
+          <TokenList tokens={tokenBalances?.tokens || []} navigator={setActiveTab} />
         </TabsContent>
         <TabsContent value="addFunds">
           <AddFunds />

@@ -99,6 +99,7 @@ export function Swap({
       </div>
 
       <SwapInputRow
+        tokenBalances={tokenBalances}
         inputLoading={fetchingQuote}
         inputDisabled={true}
         amount={quoteAmount}
@@ -164,10 +165,14 @@ function SwapInputRow({
   inputLoading?: boolean;
   tokenList?: TokenApiList[];
 }) {
+  const [insufficientFunds, setInsufficientFunds] = useState<boolean>(false)
+
   return (
     <div
-      className={`border flex justify-between pl-6 pt-6 pb-6 ${topBorderEnabled ? "rounded-t-xl" : ""
-        } ${bottomBorderEnabled ? "rounded-b-xl" : ""}`}
+      className={`border flex justify-between pl-6 pt-6 pb-6 
+        ${topBorderEnabled ? "rounded-t-xl" : ""} 
+        ${bottomBorderEnabled ? "rounded-b-xl" : ""}
+        ${insufficientFunds ? "border-red-500" : "border-gray-300"}`}
     >
       <div>
         <div className="text-xs font-semibold mb-1">{title}</div>
@@ -176,25 +181,54 @@ function SwapInputRow({
       </div>
       <div>
         <div className="relative">
-          <input
-            disabled={inputDisabled}
-            onChange={(e) => onAmountChange?.(e.target.value)}
-            placeholder="0"
-            type="text"
-            className={`bg-slate-50 p-6 outline-none text-4xl pr-12 ${inputLoading ? 'text-transparent' : ''}`}
-            dir="rtl"
-            value={amount + "xyz"}
-          />
-          {inputLoading && (
-            <div className="absolute inset-y-0 right-0 flex items-center pr-12">
-              <div className='flex space-x-1 justify-center items-center dark:invert'>
-                <span className='sr-only'>Loading...</span>
-                <div className='h-1.5 w-1.5 bg-black rounded-full animate-bounce [animation-delay:-0.3s]'></div>
-                <div className='h-1.5 w-1.5 bg-black rounded-full animate-bounce [animation-delay:-0.15s]'></div>
-                <div className='h-1.5 w-1.5 bg-black rounded-full animate-bounce'></div>
+          <div>
+            <input
+              disabled={inputDisabled}
+              onChange={(e) => {
+                onAmountChange?.(e.target.value)
+                const balance = parseFloat(tokenBalances?.tokens.find((x) => x.name === selectedToken.name)?.balance ?? "0");
+                const validAmount = e.target.value !== undefined ? parseFloat(e.target.value) : NaN;
+                const insufficientFunds = balance < validAmount;
+                setInsufficientFunds(insufficientFunds);
+              }}
+              placeholder="0"
+              type="number"
+              className={`bg-slate-50 text-right p-6 outline-none text-4xl pr-2 
+              ${inputLoading ? 'text-transparent' : ''} 
+              ${insufficientFunds ? 'text-red-500' : 'text-black'}`}
+              dir="ltr"
+              value={amount}
+            />
+            {insufficientFunds && <div className="flex justify-end mr-2">
+              <div className="flex text-xs mb-1 mt-1 px-2 py-1 font-bold bg-[#fdeaeb] text-[#de3030] rounded-lg">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-3 h-3 text-red-500 mr-1"
+                >
+                  <path d="M12 2L2 22h20L12 2z" />
+                  <line x1="12" y1="8" x2="12" y2="13" />
+                  <circle cx="12" cy="16" r="1" />
+                </svg> Insufficient Funds
               </div>
-            </div>
-          )}
+            </div>}
+
+            {inputLoading && (
+              <div className="absolute inset-y-0 right-0 flex items-center pr-12">
+                <div className='flex space-x-1 justify-center items-center dark:invert'>
+                  <span className='sr-only'>Loading...</span>
+                  <div className='h-1.5 w-1.5 bg-black rounded-full animate-bounce [animation-delay:-0.3s]'></div>
+                  <div className='h-1.5 w-1.5 bg-black rounded-full animate-bounce [animation-delay:-0.15s]'></div>
+                  <div className='h-1.5 w-1.5 bg-black rounded-full animate-bounce'></div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
