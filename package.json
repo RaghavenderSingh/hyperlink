@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@moonpay/moonpay-node": "^0.2.6",
     "@moonpay/moonpay-react": "^1.7.3",
     "@project-serum/anchor": "^0.26.0",
     "@radix-ui/react-dialog": "^1.1.1",
