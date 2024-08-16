@@ -59,16 +59,19 @@ function TokenRow({ token }: { token: TokenWithbalance }) {
           />
         </div>
         <div>
-          <div className="font-bold">{token.name}</div>
-          <div className="font-slim">
+          <div className="font-bold">
+            {token.name === "SOL" ? "Solana" : token.name}
+          </div>
+          <div className="text-slate-500 pt-1 text-sm">
             1 {token.name} = ~${token.price}
           </div>
         </div>
       </div>
       <div>
         <div>
-          <div className="font-bold flex justify-end">{token.usdBalance}</div>
-          <div className="font-slim flex justify-end">{token.balance}</div>
+          <div className="font-slim flex justify-end">
+            {token.balance} <span className="text-slate-500">{token.name}</span>
+          </div>
         </div>
       </div>
     </div>
