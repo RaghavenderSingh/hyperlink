@@ -2,10 +2,13 @@ import { useTokens } from "@/app/hooks/useTokens";
 import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Wallet } from "lucide-react";
+import WalletModal from "./WalletModal";
 
 export default function Assets({ publicKey }: { publicKey: string }) {
   const [copied, setCopied] = useState(false);
   const { tokenBalances, loading } = useTokens(publicKey);
+  const [showModal, setShowModal] = useState(false);
+
   useEffect(() => {
     if (copied) {
       let timeout = setTimeout(() => {
@@ -16,11 +19,11 @@ export default function Assets({ publicKey }: { publicKey: string }) {
       };
     }
   }, [copied]);
-  console.log("122", tokenBalances);
   if (loading) {
     return "Loading...";
   }
   return (
+
     <>
       <div className="text-slate-500 mt-4 ">
         <div className="flex items-center gap-2">
@@ -44,6 +47,7 @@ export default function Assets({ publicKey }: { publicKey: string }) {
               onClick={() => {
                 navigator.clipboard.writeText(publicKey);
                 setCopied(true);
+                setShowModal(true)
               }}
             >
               {copied ? "Copied" : "Wallet Address"}
@@ -51,6 +55,13 @@ export default function Assets({ publicKey }: { publicKey: string }) {
           </div>
         </div>
       </div>
+      {showModal && (
+        <WalletModal
+          isVisible={showModal}
+          onClose={() => setShowModal(false)}
+          publicKey={publicKey}
+        />
+      )}
     </>
   );
 }
