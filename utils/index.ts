@@ -1,41 +1,10 @@
 import bs58 from "bs58";
 import crypto from "crypto";
 
-import { ACTIONS, GlobalContext } from "../context/GlobalContext";
-import { getStore } from "../store/GlobalStore";
-
 export const ZERO_USD = "$0";
 export const MIN_VAL = 0.000001;
 
-export const toastFlashMessage = (
-    message: string | React.ReactElement,
-    type: string,
-    delay = 3000,
-) => {
-    const { dispatch } = getStore();
-    dispatch({
-        type: ACTIONS.CLEAR_TOAST,
-        payload: {
-            message: "",
-            toastType: "",
-        },
-    });
-    setTimeout(function () {
-        dispatch({
-            type: ACTIONS.SHOW_TOAST,
-            payload: {
-                message: message,
-                toastType: type,
-            },
-        });
-        setTimeout(function () {
-            dispatch({
-                type: ACTIONS.HIDE_TOAST,
-                payload: {},
-            });
-        }, delay);
-    }, 200);
-};
+
 
 export const numHex = (num: number) => {
     return hexFormatter(num.toString(16));

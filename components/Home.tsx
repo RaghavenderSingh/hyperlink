@@ -24,7 +24,7 @@ import { useWagmi } from "../utils/wagmi/WagmiContext";
 import Hero from "@/components/Hero";
 import Wallet from "@/components/Wallet";
 import WalletNav from "@/components/WalletNav";
-import { setPrivateKey } from "@/lib/KeyStore";
+import { setPrivateKey, setPublicKey } from "@/lib/KeyStore";
 
 export default function Home() {
   const [walletAddress, setWalletAddress] = useState<string>("");
@@ -104,6 +104,7 @@ export default function Home() {
     if (web3auth && web3auth.connected) {
       getAccounts().then((res: any) => {
         setWalletAddress(res);
+        setPublicKey(res);
         getUser(web3auth);
       });
     }
@@ -129,6 +130,7 @@ export default function Home() {
     const user = await web3auth?.getUserInfo();
     setUser(user);
     setWalletAddress(acc);
+    setPublicKey(acc);
   };
 
   const getAccounts = async () => {
@@ -138,12 +140,11 @@ export default function Home() {
     try {
       //@ts-ignore
       const accounts = await solanaWallet.requestAccounts();
-
-      console.log("121", accounts);
       const priv = (await provider.request({
         method: "private_key",
       })) as string;
       setPrivateKey(priv);
+
       return await accounts[0];
     } catch (error) {
       return error;
@@ -168,6 +169,7 @@ export default function Home() {
       localStorage.setItem("isGoogleLogin", "false");
       setConnecting(false);
       setWalletAddress(address);
+      setPublicKey(address);
     }
   }, [isConnecting]);
   async function getUser(web3auth: any) {

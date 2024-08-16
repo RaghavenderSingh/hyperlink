@@ -6,6 +6,7 @@ import { useTokens } from "@/app/hooks/useTokens";
 import { TokenList } from "./TokenList";
 import AddFunds from "./AddFunds";
 import { useState } from "react"
+import AddFunds from "./AddFunds/AddFunds";
 
 export default function Wallet({
   name,
