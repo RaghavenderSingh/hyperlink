@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import { Button } from "../ui/button";
 import {
   ChevronRight,
@@ -6,11 +7,14 @@ import {
   RectangleEllipsis,
   Wallet,
 } from "lucide-react";
+import WalletModal from "../WalletModal";
+import { getPublicKey } from "@/lib/KeyStore";
 
 type FundingOptionsProps = {
   setStep: (value: number) => void;
 };
 export default function FundingOptions({ setStep }: FundingOptionsProps) {
+  const [showModal, setShowModal] = useState(false);
   return (
     <div>
       <div className=" flex-col px-25 py-10">
@@ -59,7 +63,7 @@ export default function FundingOptions({ setStep }: FundingOptionsProps) {
             </div>
           </Button>
           <Button
-            disabled
+            onClick={() => setShowModal(true)}
             className="flex  justify-between text-lg font-medium p-10 xs:w-full xs:text-base"
           >
             <div className="flex items-start  justify-start gap-[10px] ">
@@ -80,6 +84,13 @@ export default function FundingOptions({ setStep }: FundingOptionsProps) {
           </Button>
         </div>
       </div>
+      {showModal && (
+        <WalletModal
+          isVisible={showModal}
+          onClose={() => setShowModal(false)}
+          publicKey={getPublicKey()}
+        />
+      )}
     </div>
   );
 }
