@@ -28,7 +28,7 @@ export const useSolanaTransfer = () => {
       );
       const sender = new PublicKey(publicKey);
       const recipient = new PublicKey(recipientAddress);
-      const lamports = amount * LAMPORTS_PER_SOL;
+      const lamports = amount;
 
       const transaction = new Transaction().add(
         SystemProgram.transfer({
