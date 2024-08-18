@@ -13,7 +13,7 @@ export default function WalletNav({
   signOut: () => Promise<void>;
 }) {
   return (
-    <div className="flex justify-between gap-4 bg-white p-4 rounded-lg ">
+    <div className="flex justify-between gap-4 p-4 rounded-lg ">
       {/* <Image alt="" src={"/public/assets/logo.jpg"} width={200} height={200} /> */}
       <div></div>
       <div></div>
