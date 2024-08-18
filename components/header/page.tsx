@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { FaGoogle } from "react-icons/fa6";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { Wallet } from "lucide-react";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 interface IHeader {
   walletAddress: string;
@@ -14,7 +17,7 @@ interface IHeader {
 
 export default function Header(props: IHeader) {
   const { signIn } = props;
-
+  const { connected } = useWallet();
   return (
     <div>
       <header className="relative z-[9]">
@@ -61,17 +64,26 @@ export default function Header(props: IHeader) {
                 </nav>
               </div>
               <div className="flex gap-4 items-center pr-2">
-                <Button
-                  onClick={signIn}
-                  className="pl-2 py-6 text-sm md:text-base"
-                >
-                  <span className="flex items-center gap-2">
-                    <div className="px-3 py-2 rounded-lg border bg-white text-black">
-                      <FaGoogle />
-                    </div>
-                    Sign up
-                  </span>
-                </Button>
+                <div>
+                  <WalletMultiButton
+                    style={{ backgroundColor: "black", height: "40px" }}
+                  >
+                    {!connected && <Wallet />}
+                  </WalletMultiButton>
+                </div>
+                <div>
+                  <Button
+                    onClick={signIn}
+                    className="pl-2 py-6 text-sm md:text-base"
+                  >
+                    <span className="flex items-center gap-2">
+                      <div className="px-3 py-2 rounded-lg border bg-white text-black">
+                        <FaGoogle />
+                      </div>
+                      Sign up
+                    </span>
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
