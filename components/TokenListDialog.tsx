@@ -17,9 +17,9 @@ export function TokenListDialog({
   onSelect: (asset: TokenApiList) => void;
 }) {
   const [localSelectedToken, setLocalSelectedToken] =
-    useState<TokenApiList | null>(selectedToken || null);
+    useState<TokenApiList | null>(selectedToken ?? null);
   useEffect(() => {
-    setLocalSelectedToken(selectedToken || null);
+    setLocalSelectedToken(selectedToken ?? null);
   }, [selectedToken]);
   const [open, setOpen] = useState(false);
   const { tokens, loading, error } = useFetchTokens()
@@ -28,7 +28,7 @@ export function TokenListDialog({
       <DialogTrigger asChild>
         <Button onClick={() => setOpen(true)}>
           <img src={localSelectedToken?.logoURI} alt={localSelectedToken?.name} className="w-6 h-6 mr-2"></img>
-          {localSelectedToken?.name}
+          {localSelectedToken?.symbol}
           <div className="w-2 h-2 ml-2 text-white flex items-center">
             <svg
               className="w-2 h-2 text-white"  // Adjust size and margin as needed

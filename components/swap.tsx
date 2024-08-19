@@ -30,6 +30,10 @@ export function Swap({
   // Use debouncing
 
   useEffect(() => {
+    setBaseAsset(tokens?.[0]);
+    setQuoteAsset(tokens?.[1])
+  }, [tokens])
+  useEffect(() => {
     if (!baseAmount) {
       return;
     }

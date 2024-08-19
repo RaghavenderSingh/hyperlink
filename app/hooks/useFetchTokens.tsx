@@ -23,7 +23,7 @@ export const useFetchTokens = () => {
       if (!cachedTokens) {
         try {
           const response = await axios.get<TokenApiList[]>(
-            "https://token.jup.ag/all"
+            "https://tokens.jup.ag/tokens?tags=verified"
           );
           setTokens(response.data);
           setLoading(false);
