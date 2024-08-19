@@ -2,11 +2,12 @@
 import React, { useState, useEffect } from "react";
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { HyperLink } from "@/url";
+
 import background from "../../public/assets/images/background.jpg";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Bookmark, Copy, QrCodeIcon } from "lucide-react";
+import { HyperLink } from "@/utils/url";
 
 interface HyperLinkData {
   keypair: {
