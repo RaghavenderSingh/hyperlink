@@ -41,6 +41,8 @@ function Greeting({ image, name }: { image: string; name: string }) {
 }
 function Tab({ publicKey }: { publicKey: string }) {
   const { tokenBalances, loading } = useTokens(publicKey);
+  console.log("tokenBalances")
+  console.log(tokenBalances)
   const [activeTab, setActiveTab] = useState("account");
   return (
     <Tabs

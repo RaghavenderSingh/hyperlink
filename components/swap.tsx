@@ -6,7 +6,6 @@ import axios from "axios";
 import { TokenWithbalance } from "@/app/hooks/useTokens";
 import { Button } from "./ui/button";
 import { TokenApiList, useFetchTokens } from "@/app/hooks/useFetchTokens";
-import { TokenList } from "./TokenList";
 import { TokenListDialog } from "./TokenListDialog";
 
 export function Swap({
@@ -20,9 +19,8 @@ export function Swap({
   } | null;
 }) {
   const { tokens, loading, error } = useFetchTokens();
-  //console.log("asasasa", tokens[0]);
-  const [baseAsset, setBaseAsset] = useState(SUPPORTED_TOKENS[0]);
-  const [quoteAsset, setQuoteAsset] = useState(SUPPORTED_TOKENS[1]);
+  const [baseAsset, setBaseAsset] = useState(tokens?.[0]);
+  const [quoteAsset, setQuoteAsset] = useState(tokens?.[1]);
   const [baseAmount, setBaseAmount] = useState<string>();
   const [quoteAmount, setQuoteAmount] = useState<string>();
   const [fetchingQuote, setFetchingQuote] = useState(false);
@@ -36,21 +34,22 @@ export function Swap({
       return;
     }
     setFetchingQuote(true);
-    axios
-      .get(
-        `https://quote-api.jup.ag/v6/quote?inputMint=${baseAsset.mint
-        }&outputMint=${quoteAsset.mint}&amount=${Number(baseAmount) * 10 ** baseAsset.decimals
-        }&slippageBps=50`
-      )
-      .then((res) => {
-        setQuoteAmount(
-          (
-            Number(res.data.outAmount) / Number(10 ** quoteAsset.decimals)
-          ).toString()
-        );
-        setFetchingQuote(false);
-        setQuoteResponse(res.data);
-      });
+    quoteAsset?.address && baseAsset?.address &&
+      axios
+        .get(
+          `https://quote-api.jup.ag/v6/quote?inputMint=${baseAsset?.address
+          }&outputMint=${quoteAsset?.address}&amount=${Number(baseAmount) * 10 ** baseAsset?.decimals
+          }&slippageBps=50`
+        )
+        .then((res) => {
+          setQuoteAmount(
+            (
+              Number(res.data.outAmount) / Number(10 ** quoteAsset?.decimals)
+            ).toString()
+          );
+          setFetchingQuote(false);
+          setQuoteResponse(res.data);
+        });
   }, [baseAsset, quoteAsset, baseAmount]);
 
   const swapAssets = () => {
@@ -80,10 +79,10 @@ export function Swap({
             <div className="font-normal pr-1">Current Balance:</div>
             <div className="font-semibold">
               {
-                tokenBalances?.tokens.find((x) => x.name === baseAsset.name)
+                tokenBalances?.tokens.find((x) => x.name === baseAsset?.symbol)
                   ?.balance
               }{" "}
-              {baseAsset.name}
+              {baseAsset?.symbol}
             </div>
           </div>
         }
@@ -147,14 +146,13 @@ function SwapInputRow({
   bottomBorderEnabled,
   inputDisabled,
   inputLoading,
-  tokenList,
 }: {
   tokenBalances: {
     totalBalance: number;
     tokens: TokenWithbalance[];
   } | null;
-  onSelect: (asset: TokenDetails) => void;
-  selectedToken: TokenDetails;
+  onSelect: (asset: TokenApiList) => void;
+  selectedToken?: TokenApiList;
   title: string;
   subtitle?: ReactNode;
   topBorderEnabled: boolean;
@@ -186,7 +184,7 @@ function SwapInputRow({
               disabled={inputDisabled}
               onChange={(e) => {
                 onAmountChange?.(e.target.value)
-                const balance = parseFloat(tokenBalances?.tokens.find((x) => x.name === selectedToken.name)?.balance ?? "0");
+                const balance = parseFloat(tokenBalances?.tokens.find((x) => x.name === selectedToken?.name)?.balance ?? "0");
                 const validAmount = e.target.value !== undefined ? parseFloat(e.target.value) : NaN;
                 const insufficientFunds = balance < validAmount;
                 setInsufficientFunds(insufficientFunds);

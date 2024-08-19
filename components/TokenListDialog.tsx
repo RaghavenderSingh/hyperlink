@@ -13,13 +13,13 @@ export function TokenListDialog({
   selectedToken,
   onSelect,
 }: {
-  selectedToken: TokenDetails;
-  onSelect: (asset: TokenDetails) => void;
+  selectedToken?: TokenApiList;
+  onSelect: (asset: TokenApiList) => void;
 }) {
   const [localSelectedToken, setLocalSelectedToken] =
-    useState<TokenDetails>(selectedToken);
+    useState<TokenApiList | null>(selectedToken || null);
   useEffect(() => {
-    setLocalSelectedToken(selectedToken);
+    setLocalSelectedToken(selectedToken || null);
   }, [selectedToken]);
   const [open, setOpen] = useState(false);
   const { tokens, loading, error } = useFetchTokens()
@@ -27,7 +27,7 @@ export function TokenListDialog({
     <Dialog open={open} onOpenChange={setOpen} >
       <DialogTrigger asChild>
         <Button onClick={() => setOpen(true)}>
-          <img src={localSelectedToken?.image} alt={localSelectedToken?.name} className="w-6 h-6 mr-2"></img>
+          <img src={localSelectedToken?.logoURI} alt={localSelectedToken?.name} className="w-6 h-6 mr-2"></img>
           {localSelectedToken?.name}
           <div className="w-2 h-2 ml-2 text-white flex items-center">
             <svg
@@ -49,14 +49,19 @@ export function TokenListDialog({
         </Button>
       </DialogTrigger>
       <DialogContent className="width-full">
-        {tokens && <AllTokensComponent tokens={tokens} />}
+        {tokens && <AllTokensComponent tokens={tokens} setLocalSelectedToken={setLocalSelectedToken} onSelect={onSelect} setParentOpen={setOpen} />}
       </DialogContent>
     </Dialog >
   );
 }
 
 
-const AllTokensComponent = ({ tokens }: { tokens: TokenApiList[] }) => {
+const AllTokensComponent = ({ tokens, setLocalSelectedToken, onSelect, setParentOpen }: {
+  tokens: TokenApiList[];
+  setLocalSelectedToken: (token: TokenApiList) => void;
+  onSelect: (asset: TokenApiList) => void;
+  setParentOpen: (flag: boolean) => void;
+}) => {
   const tokenRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -65,7 +70,7 @@ const AllTokensComponent = ({ tokens }: { tokens: TokenApiList[] }) => {
   const [debouncedTokenInput, setDebouncedTokenInput] = useState<string>('');
   const [searchedTokens, setSearchedTokens] = useState<TokenApiList[] | null>(null);
 
-
+  console.log(tokens)
   useEffect(() => {
     if (searchQuery === "") {
       setSearchedTokens(tokens)
@@ -87,7 +92,6 @@ const AllTokensComponent = ({ tokens }: { tokens: TokenApiList[] }) => {
       );
       setSearchedTokens(searchedTokens)
     }
-    console.log("debouncedTokenInput: " + debouncedTokenInput)
   }, [debouncedTokenInput]);
 
   useEffect(() => {
@@ -121,16 +125,28 @@ const AllTokensComponent = ({ tokens }: { tokens: TokenApiList[] }) => {
       <div ref={tokenRef} className="" >
         <CommandList className="border shadow-md">
           {searchedTokens ? searchedTokens.slice(0, currentTokens).map((token) => (
-            <CommandItem key={token.address}>
-              <img src={token.logoURI} alt={token.name} className="w-6 h-6 mr-2" />
-              {token.name}
-            </CommandItem>
+            <div className="onhover: bg-gray-200" onClick={() => {
+              setLocalSelectedToken(token);
+              onSelect(token);
+              setParentOpen(false);
+            }}>
+              <CommandItem key={token.address}>
+                <img src={token.logoURI} alt={token.name} className="w-6 h-6 mr-2" />
+                {token.symbol}
+              </CommandItem>
+            </div>
 
           )) : tokens && tokens.slice(0, currentTokens).map((token) => (
-            <CommandItem key={token.address}>
-              <img src={token.logoURI} alt={token.name} className="w-6 h-6 mr-2" />
-              {token.name}
-            </CommandItem>
+            <div className="onhover: bg-gray-200" onClick={() => {
+              setLocalSelectedToken(token);
+              onSelect(token);
+              setParentOpen(false);
+            }}>
+              <CommandItem key={token.address}>
+                <img src={token.logoURI} alt={token.name} className="w-6 h-6 mr-2" />
+                {token.symbol}
+              </CommandItem>
+            </div>
 
           ))}
           <div ref={sentinelRef} />
