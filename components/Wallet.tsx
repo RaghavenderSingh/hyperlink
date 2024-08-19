@@ -6,6 +6,7 @@ import { useTokens } from "@/app/hooks/useTokens";
 import { TokenList } from "./TokenList";
 import { useState } from "react";
 import AddFunds from "./AddFunds/AddFunds";
+import Withdraw from "./Withdraw/Withdraw";
 
 export default function Wallet({
   name,
@@ -55,7 +56,7 @@ function Tab({ publicKey }: { publicKey: string }) {
         <TabsTrigger className="text-xl " value="addFunds">
           Add funds
         </TabsTrigger>
-        <TabsTrigger disabled className="text-xl " value="withdraw">
+        <TabsTrigger className="text-xl " value="withdraw">
           Withdraw
         </TabsTrigger>
         <TabsTrigger className="text-xl " value="swap">
@@ -72,7 +73,9 @@ function Tab({ publicKey }: { publicKey: string }) {
         <TabsContent value="addFunds">
           <AddFunds />
         </TabsContent>
-        <TabsContent value="withdraw">Change your password here.</TabsContent>
+        <TabsContent value="withdraw">
+          <Withdraw />
+        </TabsContent>
         <TabsContent value="swap">
           <Swap tokenBalances={tokenBalances} publicKey={publicKey} />
         </TabsContent>

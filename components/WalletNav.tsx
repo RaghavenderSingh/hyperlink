@@ -1,9 +1,9 @@
 "use client";
-import React, { useState } from "react";
-import { Button } from "./ui/button";
-import { AlignJustify, Wallet } from "lucide-react";
+import React from "react";
+import { Wallet } from "lucide-react";
 import { SheetDemo } from "./DrawerNav";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 export default function WalletNav({
   profileImage,
@@ -12,8 +12,9 @@ export default function WalletNav({
   profileImage: string;
   signOut: () => Promise<void>;
 }) {
+  const { connected } = useWallet();
   return (
-    <div className="flex justify-between gap-4 bg-white p-4 rounded-lg ">
+    <div className="flex justify-between gap-4 p-4 rounded-lg ">
       {/* <Image alt="" src={"/public/assets/logo.jpg"} width={200} height={200} /> */}
       <div></div>
       <div></div>
@@ -22,7 +23,7 @@ export default function WalletNav({
           <WalletMultiButton
             style={{ backgroundColor: "black", height: "40px" }}
           >
-            <Wallet />
+            {!connected && <Wallet />}
           </WalletMultiButton>
 
           <SheetDemo profileImage={profileImage} signOut={signOut} />

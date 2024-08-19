@@ -29,6 +29,7 @@ const Hero = (props: IHeader) => {
           height={50}
         /> */}
         <div className="max-w-[600px] lg:max-w-[900px] mx-auto">
+          <div></div>
           <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold tracking-tighter bg-gradient-to-b from-black to-black/70 text-transparent bg-clip-text text-center">
             Experience the future of crypto today
           </h1>
