@@ -12,12 +12,14 @@ import ConnectOptionsButton from "./ui/ConnectOptionsButton";
 import { Card } from "./ui/card";
 import CustomTextField from "./CustomTextField";
 import { Button } from "./ui/button";
+import { useRouter } from "next/navigation";
 
 export default function CreateLinkWallet() {
   const [amount, setAmount] = useState("0");
   const [generatedLink, setGeneratedLink] = useState("");
   const [error, setError] = useState("");
   const { connected, publicKey, sendTransaction } = useWallet();
+  const router = useRouter();
 
   const handleSelection = (selectedOption: any) => {
     console.log("Selected option:", selectedOption);
@@ -52,7 +54,11 @@ export default function CreateLinkWallet() {
       );
 
       const signature = await sendTransaction(transaction, connection);
-      await connection.confirmTransaction(signature, "confirmed");
+      await connection
+        .confirmTransaction(signature, "confirmed")
+        .then((res) => {
+          window.open(generatedLink, "_blank");
+        });
 
       console.log("Transfer successful. Signature:", signature);
       setError("");
@@ -61,7 +67,7 @@ export default function CreateLinkWallet() {
       setError("Error creating HyperLink or transferring funds.");
     }
   };
-
+  console.log("hy", generatedLink);
   return (
     <Card className="w-full max-w-md mx-auto p-6 space-y-4">
       <h2 className="text-2xl font-bold text-center">Create HyperLink</h2>
@@ -97,13 +103,6 @@ export default function CreateLinkWallet() {
       >
         Create Hyperlink and Transfer
       </Button>
-
-      {generatedLink && (
-        <div className="mt-4">
-          <p className="font-semibold">Generated HyperLink:</p>
-          <p className="break-all text-sm">{generatedLink}</p>
-        </div>
-      )}
 
       {error && <p className="text-red-500 text-sm">{error}</p>}
     </Card>
