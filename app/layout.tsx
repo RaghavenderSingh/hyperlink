@@ -4,6 +4,7 @@ import "./globals.css";
 import { SolanaWalletProvider } from "@/context/SolanaWalletContext";
 import { WagmiWrapper } from "@/utils/wagmi/WagmiContext";
 import AppWalletProvider from "@/components/AppWalletProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,7 +23,10 @@ export default function RootLayout({
       <body className={inter.className}>
         <WagmiWrapper>
           <AppWalletProvider>
-            <SolanaWalletProvider>{children}</SolanaWalletProvider>
+            <SolanaWalletProvider>
+              {children}
+              <Toaster />
+            </SolanaWalletProvider>
           </AppWalletProvider>
         </WagmiWrapper>
       </body>
