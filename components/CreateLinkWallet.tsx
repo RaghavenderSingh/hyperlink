@@ -36,8 +36,7 @@ export default function CreateLinkWallet() {
       // Create HyperLink
       const hyperlink = await HyperLink.create(0);
       const hyperlinkUrl = hyperlink.url.toString();
-      setGeneratedLink(hyperlinkUrl);
-      console.log(Buffer.from(hyperlink.keypair.secretKey).toString("hex"));
+
       // Transfer funds
       const connection = new Connection(
         "https://api.devnet.solana.com",
@@ -59,7 +58,7 @@ export default function CreateLinkWallet() {
         .then((res) => {
           window.open(generatedLink, "_blank");
         });
-
+      setGeneratedLink(hyperlinkUrl);
       console.log("Transfer successful. Signature:", signature);
       setError("");
     } catch (err) {
@@ -67,7 +66,6 @@ export default function CreateLinkWallet() {
       setError("Error creating HyperLink or transferring funds.");
     }
   };
-  console.log("hy", generatedLink);
   return (
     <Card className="w-full max-w-md mx-auto p-6 space-y-4">
       <h2 className="text-2xl font-bold text-center">Create HyperLink</h2>
