@@ -20,8 +20,6 @@ export default function ConnectedWallet({ setStep }: FundingOptionsProps) {
   const [balance, setBalance] = useState(0);
   const { connection } = useConnection();
   const [amount, setAmount] = useState("");
-  console.log("publicKey", publicKey);
-  console.log("wallet", wallets);
   useEffect(() => {
     if (!connection || !publicKey) {
       return;

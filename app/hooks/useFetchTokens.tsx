@@ -13,24 +13,31 @@ export interface TokenApiList {
   mint_authority: string | null;
 }
 
+let cachedTokens: TokenApiList[] | null = null;
 export const useFetchTokens = () => {
   const [tokens, setTokens] = useState<TokenApiList[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const response = await axios.get<TokenApiList[]>(
-          "https://token.jup.ag/all"
-        );
-        setTokens(response.data);
-        console.log(response.data);
-        setLoading(false);
-      } catch (err) {
-        setError("Error fetching token data");
+      if (!cachedTokens) {
+        try {
+          const response = await axios.get<TokenApiList[]>(
+            "https://tokens.jup.ag/tokens?tags=verified"
+          );
+          setTokens(response.data);
+          setLoading(false);
+        } catch (err) {
+          setError("Error fetching token data");
+          setLoading(false);
+        }
+      }
+      else {
+        setTokens(cachedTokens);
         setLoading(false);
       }
-    };
+
+    }
 
     fetchData();
   }, []);
