@@ -1,9 +1,9 @@
-"use client";
-import Header from "@/components/header/page";
+// context/GlobalContext.tsx
+import { createContext, useState, useEffect, FC, ReactNode } from "react";
 import {
   CHAIN_NAMESPACES,
-  SafeEventEmitterProvider,
   WALLET_ADAPTERS,
+  SafeEventEmitterProvider,
 } from "@web3auth/base";
 import {
   SolanaWallet,
@@ -11,8 +11,6 @@ import {
 } from "@web3auth/solana-provider";
 import { Web3AuthNoModal } from "@web3auth/no-modal";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
-import React, { useEffect, useState } from "react";
-import { useAccount } from "wagmi";
 import {
   oauthClientId,
   productName,
@@ -20,13 +18,26 @@ import {
   web3AuthLoginType,
   web3AuthVerifier,
 } from "../constants";
-import { useWagmi } from "../utils/wagmi/WagmiContext";
-import Hero from "@/components/Hero";
-import Wallet from "@/components/Wallet";
-import WalletNav from "@/components/WalletNav";
 import { setPrivateKey, setPublicKey } from "@/lib/KeyStore";
+import { useWagmi } from "../utils/wagmi/WagmiContext";
+import { useAccount } from "wagmi";
 
-export default function Home() {
+interface GlobalContextType {
+  walletAddress: string;
+  user: any;
+  signIn: () => Promise<void>;
+  signOut: () => Promise<void>;
+  setWalletAddress: (address: string) => void;
+  setUser: (user: any) => void;
+}
+
+export const GlobalContext = createContext<GlobalContextType | null>(null);
+
+interface GlobalProviderProps {
+  children: ReactNode;
+}
+
+export const GlobalProvider: FC<GlobalProviderProps> = ({ children }) => {
   const [walletAddress, setWalletAddress] = useState<string>("");
   const [connecting, setConnecting] = useState(false);
   const { disconnect } = useWagmi();
@@ -45,7 +56,7 @@ export default function Home() {
         web3AuthNetwork: "sapphire_devnet",
         chainConfig: {
           chainNamespace: CHAIN_NAMESPACES.SOLANA,
-          chainId: "0x2", // Please use 0x1 for Mainnet, 0x2 for Testnet, 0x3 for Devnet
+          chainId: "0x3", // Please use 0x1 for Mainnet, 0x2 for Testnet, 0x3 for Devnet
           rpcTarget: "https://api.devnet.solana.com",
           displayName: "Solana Devnet",
           blockExplorerUrl: "https://explorer.solana.com",
@@ -56,7 +67,7 @@ export default function Home() {
 
       const chainConfig = {
         chainNamespace: CHAIN_NAMESPACES.SOLANA,
-        chainId: "0x2", // Please use 0x1 for Mainnet, 0x2 for Testnet, 0x3 for Devnet
+        chainId: "0x3", // Please use 0x1 for Mainnet, 0x2 for Testnet, 0x3 for Devnet
         rpcTarget: "https://api.devnet.solana.com",
         displayName: "Solana Devnet",
         blockExplorer: "https://explorer.solana.com",
@@ -181,28 +192,17 @@ export default function Home() {
   }
 
   return (
-    <>
-      {walletAddress ? (
-        <>
-          <WalletNav profileImage={user?.profileImage} signOut={signOut} />
-          <Wallet
-            name={user?.name}
-            profileImage={user?.profileImage}
-            publicKey={walletAddress}
-          />
-        </>
-      ) : (
-        <div>
-          <Header
-            walletAddress={walletAddress}
-            signIn={signIn}
-            signOut={signOut}
-            setWalletAddress={setWalletAddress}
-            user={user}
-          />
-          <Hero signIn={signIn} />
-        </div>
-      )}
-    </>
+    <GlobalContext.Provider
+      value={{
+        walletAddress,
+        user,
+        signIn,
+        signOut,
+        setWalletAddress,
+        setUser,
+      }}
+    >
+      {children}
+    </GlobalContext.Provider>
   );
-}
+};

@@ -8,11 +8,7 @@ import { Wallet } from "lucide-react";
 import { useWallet } from "@solana/wallet-adapter-react";
 
 interface IHeader {
-  walletAddress: string;
   signIn: () => Promise<void>;
-  user: any;
-  signOut: () => Promise<void>;
-  setWalletAddress: (val: string) => void;
 }
 
 export default function Header(props: IHeader) {
