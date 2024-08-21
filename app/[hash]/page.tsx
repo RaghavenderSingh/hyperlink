@@ -6,6 +6,8 @@ import {
   LAMPORTS_PER_SOL,
   Transaction,
   SystemProgram,
+  Keypair,
+  sendAndConfirmTransaction,
 } from "@solana/web3.js";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import background from "../../public/assets/images/background.jpg";
@@ -23,10 +25,14 @@ import { HyperLink } from "@/utils/url";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "flowbite-react";
+import WalletModal from "@/components/WalletModal";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { useSolanaTransfer } from "@/app/hooks/useSolanaTransfer";
 
 interface HyperLinkData {
   keypair: {
     publicKey: PublicKey;
+    secretKey: Uint8Array;
   };
   url: URL;
 }
@@ -38,6 +44,9 @@ const HyperLinkCard: React.FC = () => {
   const [error, setError] = useState<string>("");
   const [url, setUrl] = useState<URL>(new URL(window.location.href));
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [showQrModal, setShowQrModal] = useState<boolean>(false);
+
+  const { publicKey } = useWallet();
 
   useEffect(() => {
     loadHyperLink();
@@ -57,7 +66,6 @@ const HyperLinkCard: React.FC = () => {
       }
     }
   };
-
   const fetchBalance = async (
     hyperlinkInstance: HyperLinkData
   ): Promise<void> => {
@@ -71,7 +79,6 @@ const HyperLinkCard: React.FC = () => {
       );
       const solBalance = balance / LAMPORTS_PER_SOL;
       setBalance(solBalance);
-
       const response = await fetch(
         "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd"
       );
@@ -162,6 +169,55 @@ const HyperLinkCard: React.FC = () => {
       setError(`Error creating new HyperLink or transferring funds: ${err}`);
     }
   };
+  const handleTransfer = async () => {
+    if (!publicKey || !balance || !hyperlink) {
+      toast.error("Missing required information for transfer.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const connection = new Connection(
+        "https://api.devnet.solana.com",
+        "confirmed"
+      );
+      const amount = balance * LAMPORTS_PER_SOL;
+      const transaction = new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey: hyperlink.keypair.publicKey,
+          toPubkey: publicKey,
+          lamports: amount - 5000,
+        })
+      );
+      const { blockhash, lastValidBlockHeight } =
+        await connection.getLatestBlockhash();
+      transaction.recentBlockhash = blockhash;
+      transaction.feePayer = hyperlink.keypair.publicKey;
+      // Sign the transaction
+      transaction.sign(hyperlink.keypair);
+      // Send and confirm the transaction
+      const signature = await sendAndConfirmTransaction(
+        connection,
+        transaction,
+        [hyperlink.keypair]
+      );
+
+      console.log(`Transfer successful! Signature: ${signature}`);
+      toast.success(`Transfer successful! Signature: ${signature}`);
+
+      await fetchBalance(hyperlink);
+    } catch (error) {
+      console.error("Transfer error:", error);
+      toast.error(
+        `Transfer failed: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // if (error) {
   //   return (
@@ -248,7 +304,17 @@ const HyperLinkCard: React.FC = () => {
         )}
         <div className="flex justify-center items-center gap-3">
           <Button className="w-full">Send</Button>
-          <Button className="w-full">Receive</Button>
+          <Button onClick={() => setShowQrModal(true)} className="w-full">
+            Receive
+          </Button>
+
+          {showQrModal && hyperlink?.keypair?.publicKey && (
+            <WalletModal
+              isVisible={showQrModal}
+              onClose={() => setShowQrModal(false)}
+              publicKey={hyperlink?.keypair?.publicKey.toBase58().toString()}
+            />
+          )}
         </div>
         <Separator className="my-10" />
         <div className="flex w-full flex-col justify-start space-y-5 xs:space-y-0 xs:flex-row xs:space-x-10">
@@ -268,9 +334,12 @@ const HyperLinkCard: React.FC = () => {
                 </div>
               </div>
             </div>
-            {isLoading ? <Spinner /> : <Loader />}
+            {isLoading ? <Spinner /> : <ChevronRight />}
           </Button>
-          <Button className="flex justify-between text-base font-medium p-10 xs:w-full xs:text-base">
+          <Button
+            onClick={handleTransfer}
+            className="flex justify-between text-base font-medium p-10 xs:w-full xs:text-base"
+          >
             <div className="flex items-start justify-start gap-[10px]">
               <div className="flex items-center justify-center align-middle mt-2 rounded-full bg-grey-50 xs:p-3">
                 <Wallet />
