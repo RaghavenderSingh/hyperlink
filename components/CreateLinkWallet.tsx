@@ -6,6 +6,7 @@ import {
   PublicKey,
   Transaction,
   SystemProgram,
+  LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
 import { HyperLink } from "@/utils/url";
 import ConnectOptionsButton from "./ui/ConnectOptionsButton";
@@ -20,7 +21,7 @@ export default function CreateLinkWallet() {
   const [error, setError] = useState("");
   const { connected, publicKey, sendTransaction } = useWallet();
   const router = useRouter();
-
+  console.log("link", 6975763 / LAMPORTS_PER_SOL, amount);
   const handleSelection = (selectedOption: any) => {
     console.log("Selected option:", selectedOption);
     // Handle the selected option here
@@ -43,7 +44,7 @@ export default function CreateLinkWallet() {
         "confirmed"
       );
       const amountLamports = parseInt(amount); // amount is already in lamports from CustomTextField
-
+      console.log("amountLamports", amountLamports);
       const transaction = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey: publicKey,
@@ -56,8 +57,9 @@ export default function CreateLinkWallet() {
       await connection
         .confirmTransaction(signature, "confirmed")
         .then((res) => {
-          window.open(generatedLink, "_blank");
+          window.open(hyperlinkUrl, "_blank");
         });
+
       setGeneratedLink(hyperlinkUrl);
       console.log("Transfer successful. Signature:", signature);
       setError("");
