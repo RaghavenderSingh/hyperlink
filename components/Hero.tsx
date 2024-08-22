@@ -5,6 +5,7 @@ import { FaGoogle } from "react-icons/fa6";
 // import sol from "@/assets/solana.svg";
 import Image from "next/image";
 import logo from "../public/assets/images/logo.png";
+import { CardDemo } from "./AnimatedCard";
 
 interface IHeader {
   signIn: () => Promise<void>;
@@ -13,10 +14,12 @@ interface IHeader {
 const Hero = (props: IHeader) => {
   const { signIn } = props;
   return (
-    <section className="items-center md:mt-40 mt-28">
+    <section className="items-center  mt-18">
       <div className="container mx-auto px-4">
         <div className="max-w-[600px] lg:max-w-[900px] mx-auto">
-          <div></div>
+          <div>
+            <CardDemo />
+          </div>
           <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold tracking-tighter bg-gradient-to-b from-black to-black/70 text-transparent bg-clip-text text-center">
             Experience the future of crypto today
           </h1>

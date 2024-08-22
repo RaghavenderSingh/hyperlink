@@ -27,6 +27,7 @@ import { useWagmi } from "../utils/wagmi/WagmiContext";
 import { useAccount } from "wagmi";
 import CreateLinkWallet from "@/components/CreateLinkWallet";
 import LinkWallet from "@/components/LinkWallet";
+import { ShieldCheck } from "lucide-react";
 
 export default function Home() {
   const [walletAddress, setWalletAddress] = useState<string>("");
