@@ -3,7 +3,7 @@ import Header from "@/components/header/page";
 import Hero from "@/components/Hero";
 import Wallet from "@/components/Wallet";
 import WalletNav from "@/components/WalletNav";
-import { createContext, useState, useEffect, FC, ReactNode } from "react";
+import { useState, useEffect } from "react";
 import {
   CHAIN_NAMESPACES,
   WALLET_ADAPTERS,
@@ -25,9 +25,7 @@ import {
 import { setPrivateKey, setPublicKey } from "@/lib/KeyStore";
 import { useWagmi } from "../utils/wagmi/WagmiContext";
 import { useAccount } from "wagmi";
-import CreateLinkWallet from "@/components/CreateLinkWallet";
 import LinkWallet from "@/components/LinkWallet";
-import { ShieldCheck } from "lucide-react";
 
 export default function Home() {
   const [walletAddress, setWalletAddress] = useState<string>("");
@@ -40,7 +38,8 @@ export default function Home() {
   );
   const [user, setUser] = useState<any>(null);
   const [solanaWallet, setSolanaWallet] = useState<SolanaWallet | null>(null);
-
+  const [loading, setLoading] = useState(false);
+  console.log("loading", loading);
   useEffect(() => {
     async function initializeOpenLogin() {
       const web3auth = new Web3AuthNoModal({
@@ -114,6 +113,7 @@ export default function Home() {
   }, [provider]);
 
   const signIn = async () => {
+    setLoading(true);
     if (!web3auth) {
       return;
     }
@@ -134,6 +134,7 @@ export default function Home() {
     setUser(user);
     setWalletAddress(acc);
     setPublicKey(acc);
+    setLoading(false);
   };
 
   const getAccounts = async () => {
@@ -155,7 +156,6 @@ export default function Home() {
   };
 
   const signOut = async () => {
-    console.log("signOut");
     await web3auth?.logout();
     localStorage.removeItem("isGoogleLogin");
     localStorage.removeItem("isConnected");
@@ -186,8 +186,8 @@ export default function Home() {
     return (
       <div>
         <section className="h-[100vh] flex flex-col items-center justify-center">
-          <Header signIn={signIn} />
-          <Hero signIn={signIn} />
+          <Header signIn={signIn} loading={loading} />
+          <Hero signIn={signIn} loading={loading} />
         </section>
         <section className="h-[100vh] flex flex-col items-center justify-center">
           <LinkWallet />
@@ -195,20 +195,21 @@ export default function Home() {
       </div>
     );
   }
-
   return (
-    <>
-      <WalletNav
-        profileImage={user?.profileImage}
-        name={user?.name}
-        mail={user?.email}
-        signOut={signOut}
-      />
-      <Wallet
-        name={user?.name}
-        profileImage={user?.profileImage}
-        publicKey={walletAddress}
-      />
-    </>
+    <div>
+      <div>
+        <WalletNav
+          profileImage={user?.profileImage}
+          name={user?.name}
+          mail={user?.email}
+          signOut={signOut}
+        />
+        <Wallet
+          name={user?.name}
+          profileImage={user?.profileImage}
+          publicKey={walletAddress}
+        />
+      </div>
+    </div>
   );
 }

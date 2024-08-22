@@ -7,6 +7,7 @@ import { TokenList } from "./TokenList";
 import { useState } from "react";
 import AddFunds from "./AddFunds/AddFunds";
 import Withdraw from "./Withdraw/Withdraw";
+import { Skeleton } from "./ui/skeleton";
 
 export default function Wallet({
   name,
@@ -17,6 +18,7 @@ export default function Wallet({
   profileImage: string;
   publicKey: string;
 }) {
+  if (!name || !profileImage || !publicKey) return <>...Loding</>;
   return (
     <div>
       <div className="flex justify-center pt-8">
@@ -31,6 +33,13 @@ export default function Wallet({
 }
 
 function Greeting({ image, name }: { image: string; name: string }) {
+  if (!name || !image)
+    return (
+      <div className="flex p-12">
+        <Skeleton className="rounded-full w-16 h-16 mr-4" />
+        <Skeleton className="h-4 w-[250px]" />
+      </div>
+    );
   return (
     <div className="flex p-12">
       <img src={image} className="rounded-full w-16 h-16 mr-4" />

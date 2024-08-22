@@ -6,13 +6,15 @@ import { FaGoogle } from "react-icons/fa6";
 import Image from "next/image";
 import logo from "../public/assets/images/logo.png";
 import { CardDemo } from "./AnimatedCard";
+import BouncingDotsLoader from "./BouncingDotsLoader";
 
 interface IHeader {
   signIn: () => Promise<void>;
+  loading: boolean;
 }
 
 const Hero = (props: IHeader) => {
-  const { signIn } = props;
+  const { signIn, loading } = props;
   return (
     <section className="items-center  mt-18">
       <div className="container mx-auto px-4">
@@ -30,12 +32,16 @@ const Hero = (props: IHeader) => {
         </div>
         <div className="flex gap-3 items-center justify-center mt-5">
           <Button onClick={signIn} className="pl-2 py-6 text-sm md:text-base">
-            <span className="flex items-center gap-2">
-              <div className="px-3 py-2 rounded-lg border bg-white text-black">
-                <FaGoogle />
-              </div>
-              Sign up with Google
-            </span>
+            {loading ? (
+              <BouncingDotsLoader />
+            ) : (
+              <span className="flex items-center gap-2">
+                <div className="px-3 py-2 rounded-lg border bg-white text-black">
+                  <FaGoogle />
+                </div>
+                Sign up with Google
+              </span>
+            )}
           </Button>
           <Button className="pl-2 py-6 text-sm md:text-base">
             <span className="flex items-center gap-2">
