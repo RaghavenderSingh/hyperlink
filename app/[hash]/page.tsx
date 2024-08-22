@@ -241,8 +241,16 @@ const HyperLinkCard: React.FC = () => {
                 <div className="flex-col items-start justify-start rounded-full bg-grey-50 xs:p-3">
                   <div className="text-left">Recreate this Hyperlink</div>
                   <div className="text-left text-xs font-normal text-grey-500">
-                    Move the entire value to a new Hyperlink so only you have
-                    the link.
+                    <div>
+                      <div className="block md:hidden">
+                        <div>Move the entire value to a new</div>
+                        <div>Hyperlink so only you have the link.</div>
+                      </div>
+                      <div className="hidden md:block">
+                        Move the entire value to a new Hyperlink so only you
+                        have the link.
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -259,7 +267,13 @@ const HyperLinkCard: React.FC = () => {
                 <div className="flex-col items-start justify-start rounded-full bg-grey-50 xs:p-3">
                   <div className="text-left">Withdraw to your wallet</div>
                   <div className="text-left text-xs font-normal text-grey-500">
-                    Withdraw the entire value to your connected wallet.
+                    <div className="block md:hidden">
+                      <div>Withdraw the entire value to your </div>
+                      <div>connected wallet.</div>
+                    </div>
+                    <div className="hidden md:block">
+                      Withdraw the entire value to your connected wallet.
+                    </div>
                   </div>
                 </div>
               </div>
@@ -335,23 +349,25 @@ const HyperLinkCard: React.FC = () => {
               lose it!
             </p>
             <div className="flex justify-center items-center">
-              <Badge className="text-lg p-2 px-4">{url.href}</Badge>
+              <Badge className="text-base sm:text-lg md:text-xl p-2 sm:p-3 md:p-4 px-3 sm:px-4 md:px-5">
+                {url.href}
+              </Badge>
             </div>
             <div className="flex justify-center items-center gap-3">
-              <Button onClick={handleCopy} className="h-[80px]">
-                <div className="flex flex-col items-center px-10 p-15">
+              <Button onClick={handleCopy} className="h-[80px] flex-1">
+                <div className="flex flex-col items-center">
                   <Copy />
                   <span>Copy</span>
                 </div>
               </Button>
-              <Button onClick={handleBookmark} className="h-[80px]">
-                <div className="flex flex-col items-center px-10 p-15">
+              <Button onClick={handleBookmark} className="h-[80px] flex-1">
+                <div className="flex flex-col items-center">
                   <Bookmark />
                   <span>Bookmark</span>
                 </div>
               </Button>
-              <Button className="h-[80px]">
-                <div className="flex flex-col items-center px-10 p-15">
+              <Button className="h-[80px] flex-1">
+                <div className="flex flex-col items-center">
                   <QrCodeIcon />
                   <span>QR code</span>
                 </div>
@@ -363,24 +379,28 @@ const HyperLinkCard: React.FC = () => {
                 style={{ backgroundImage: `url(${background.src})` }}
               >
                 <div className="flex flex-col items-start">
-                  <div className="mt-10">
-                    <h1 className="text-[4rem] leading-none font-bold">Your</h1>
-                    <h1 className="text-[4rem] leading-none font-bold">
+                  <div className="mt-6 sm:mt-8 md:mt-10 lg:mt-12 xl:mt-16">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight md:leading-normal font-bold">
+                      Your
+                    </h1>
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight md:leading-normal font-bold">
                       Balance
                     </h1>
                   </div>
-                  <div className="mt-10">
+                  <div className="mt-6 sm:mt-8 md:mt-10 lg:mt-12 xl:mt-16">
                     <Badge className="text-lg">{url.hash}</Badge>
                   </div>
                 </div>
                 <div>
-                  <div className="text-center mt-[5rem]">
+                  <div className="text-center mt-6 sm:mt-8 md:mt-10 lg:mt-12 xl:mt-16">
                     <p className="text-pink-400">{balance.toFixed(4)} SOL</p>
-                    {usdBalance !== null && (
-                      <h1 className="text-4xl">${usdBalance.toFixed(2)}</h1>
+                    {usdBalance && (
+                      <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
+                        ${usdBalance.toFixed(2)}
+                      </h1>
                     )}
                   </div>
-                  <div className="flex justify-end mt-[5rem]">
+                  <div className="flex justify-end mt-10 sm:mt-6 md:mt-8 lg:mt-14 xl:mt-[7rem] ">
                     <p className="text-gray-400 text-xs">
                       POWERED BY Hyperlink
                     </p>
