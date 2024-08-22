@@ -19,7 +19,6 @@ import {
   Stars,
   Wallet,
 } from "lucide-react";
-import logo from "../public/assets/images/logo.png";
 
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";

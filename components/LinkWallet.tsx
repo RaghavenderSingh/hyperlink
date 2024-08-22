@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button";
 import { web3AuthClientId } from "@/constants";
 import { CHAIN_NAMESPACES, WALLET_ADAPTERS } from "@web3auth/base";
 import { Web3AuthNoModal } from "@web3auth/no-modal";
+import { ShieldCheck } from "lucide-react";
 import React, { use, useEffect, useState } from "react";
 import { FaGoogle, FaSquareGooglePlus } from "react-icons/fa6";
 
 export default function LinkWallet() {
   return (
-    <main className="relative mx-auto  min-h-screen w-full px-3 mobile:mt-10 mobile:px-5 mt-[60px] ml:mt-[100px] lg:px-8">
-      <div className="flex w-full flex-row items-center justify-center gap-3 pb-[132px] mobile:gap-[15px] ml:flex-row ml:items-start ml:gap-6 lg:gap-10 ">
+    <main className="relative mx-auto w-full px-3 mobile:mt-10 mobile:px-5 mt-[60px] ml:mt-[100px] lg:px-8">
+      <div className="flex w-full flex-row items-center justify-center gap-3 pb-[20px] mobile:gap-[15px] ml:flex-row ml:items-start ml:gap-6 lg:gap-10 ">
         <div>
           <CreateLinkWallet />
         </div>
@@ -55,6 +56,23 @@ export default function LinkWallet() {
             </Button>
           </div>
         </div>
+      </div>
+      <div className=" flex items-center justify-center">
+        <p className="text-sm text-gray-500 flex items-center gap-1">
+          <span>
+            <div>
+              <p className="text-sm text-gray-500 flex items-center gap-1">
+                <span>
+                  <ShieldCheck />
+                </span>
+                <span>
+                  All Hyperlinks are non-custodial wallets. HyperLink does not
+                  and cannot access your digital assets.
+                </span>
+              </p>
+            </div>
+          </span>
+        </p>
       </div>
     </main>
   );
