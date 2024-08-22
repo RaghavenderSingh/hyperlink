@@ -6,13 +6,11 @@ import { FaGoogle } from "react-icons/fa6";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { Wallet } from "lucide-react";
 import { useWallet } from "@solana/wallet-adapter-react";
+import logo from "../../public/assets/images/logo.png";
+import Image from "next/image";
 
 interface IHeader {
-  walletAddress: string;
   signIn: () => Promise<void>;
-  user: any;
-  signOut: () => Promise<void>;
-  setWalletAddress: (val: string) => void;
 }
 
 export default function Header(props: IHeader) {
@@ -26,7 +24,7 @@ export default function Header(props: IHeader) {
             <div className="flex justify-between items-center md:border md:p-2.5 rounded-xl max-w-2xl lg:max-w-4xl mx-auto md:bg-white/90 md:backdrop:blur-sm">
               <div>
                 <div className="border h-10 w-10 rounded-lg inline-flex justify-center items-center">
-                  {/* <Logo className="h-8 w-8" fill="#000000" /> */}
+                  <Image src={logo} alt="logo" width={75} height={60} />
                 </div>
               </div>
               <div className="hidden md:block">

@@ -14,6 +14,7 @@ import background from "../../public/assets/images/background.jpg";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
+  ArrowLeft,
   Bookmark,
   ChevronRight,
   Copy,
@@ -28,6 +29,9 @@ import { Spinner } from "flowbite-react";
 import WalletModal from "@/components/WalletModal";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useSolanaTransfer } from "@/app/hooks/useSolanaTransfer";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import Send from "@/components/linkAsWallet/Send";
+import SendHyperlink from "@/components/linkAsWallet/SendHyperlink";
 
 interface HyperLinkData {
   keypair: {
@@ -45,8 +49,10 @@ const HyperLinkCard: React.FC = () => {
   const [url, setUrl] = useState<URL>(new URL(window.location.href));
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showQrModal, setShowQrModal] = useState<boolean>(false);
+  const [step, setStep] = useState<Number>(0);
+  const [transferAmount, setTransferAmount] = useState<string>("");
 
-  const { publicKey } = useWallet();
+  const { publicKey, connected } = useWallet();
 
   useEffect(() => {
     loadHyperLink();
@@ -218,6 +224,75 @@ const HyperLinkCard: React.FC = () => {
       setIsLoading(false);
     }
   };
+  console.log("transferAmount", transferAmount);
+  const handleSteps = (step: Number) => {
+    switch (step) {
+      case 0:
+        return (
+          <div className="flex w-full flex-col justify-start space-y-5 xs:space-y-0 xs:flex-row xs:space-x-10">
+            <Button
+              onClick={createLinkAndTransfer}
+              className="flex justify-between text-base font-medium p-10 xs:w-full xs:text-base"
+            >
+              <div className="flex items-start justify-start gap-[10px]">
+                <div className="flex items-center justify-center align-middle mt-2 rounded-full bg-grey-50 xs:p-3">
+                  <Wallet />
+                </div>
+                <div className="flex-col items-start justify-start rounded-full bg-grey-50 xs:p-3">
+                  <div className="text-left">Recreate this Hyperlink</div>
+                  <div className="text-left text-xs font-normal text-grey-500">
+                    Move the entire value to a new Hyperlink so only you have
+                    the link.
+                  </div>
+                </div>
+              </div>
+              {isLoading ? <Spinner /> : <ChevronRight />}
+            </Button>
+            <Button
+              onClick={handleTransfer}
+              className="flex justify-between text-base font-medium p-10 xs:w-full xs:text-base"
+            >
+              <div className="flex items-start justify-start gap-[10px]">
+                <div className="flex items-center justify-center align-middle mt-2 rounded-full bg-grey-50 xs:p-3">
+                  <Wallet />
+                </div>
+                <div className="flex-col items-start justify-start rounded-full bg-grey-50 xs:p-3">
+                  <div className="text-left">Withdraw to your wallet</div>
+                  <div className="text-left text-xs font-normal text-grey-500">
+                    Withdraw the entire value to your connected wallet.
+                  </div>
+                </div>
+              </div>
+              <ChevronRight />
+            </Button>
+          </div>
+        );
+      case 1:
+        return <Send setStep={setStep} />;
+      case 2:
+        return (
+          <div>
+            <SendHyperlink
+              setStep={setStep}
+              setTransferAmount={setTransferAmount}
+            />
+            <Button
+              className="mt-1 w-full"
+              disabled={transferAmount === "" ? true : false}
+              onClick={() => console.log("transferAmount", transferAmount)}
+            >
+              Send
+            </Button>
+          </div>
+        );
+      // case 3:
+      //   return <ToAddress />;
+      // default:
+      //   return <BankCard />;
+      case 4:
+        return;
+    }
+  };
 
   // if (error) {
   //   return (
@@ -240,122 +315,103 @@ const HyperLinkCard: React.FC = () => {
   // }
 
   return (
-    <Card className="w-full h-full max-w-xl mx-auto my-10">
-      <CardHeader>
-        <CardTitle className="text-xl font-bold flex items-center justify-center">
-          This is ${usdBalance?.toFixed(2)} in crypto
-        </CardTitle>
-      </CardHeader>
+    <div className="flex flex-col  m-1">
+      <div className="fixed top-4 right-4 flex items-end justify-end z-10">
+        <WalletMultiButton style={{ backgroundColor: "black", height: "40px" }}>
+          {!connected && <Wallet />}
+        </WalletMultiButton>
+      </div>
+      <div>
+        <Card className="w-full h-full max-w-xl mx-auto my-10">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold flex items-center justify-center">
+              This is ${usdBalance?.toFixed(2)} in crypto
+            </CardTitle>
+          </CardHeader>
 
-      <CardContent className="space-y-4">
-        <p className="text-lg font-thin text-center">
-          The link to this page contains this value. Make sure you don't lose
-          it!
-        </p>
-        <div className="flex justify-center items-center">
-          <Badge className="text-lg p-2 px-4">{url.href}</Badge>
-        </div>
-        <div className="flex justify-center items-center gap-3">
-          <Button onClick={handleCopy} className="h-[80px]">
-            <div className="flex flex-col items-center px-10 p-15">
-              <Copy />
-              <span>Copy</span>
+          <CardContent className="space-y-4">
+            <p className="text-lg font-thin text-center">
+              The link to this page contains this value. Make sure you don't
+              lose it!
+            </p>
+            <div className="flex justify-center items-center">
+              <Badge className="text-lg p-2 px-4">{url.href}</Badge>
             </div>
-          </Button>
-          <Button onClick={handleBookmark} className="h-[80px]">
-            <div className="flex flex-col items-center px-10 p-15">
-              <Bookmark />
-              <span>Bookmark</span>
+            <div className="flex justify-center items-center gap-3">
+              <Button onClick={handleCopy} className="h-[80px]">
+                <div className="flex flex-col items-center px-10 p-15">
+                  <Copy />
+                  <span>Copy</span>
+                </div>
+              </Button>
+              <Button onClick={handleBookmark} className="h-[80px]">
+                <div className="flex flex-col items-center px-10 p-15">
+                  <Bookmark />
+                  <span>Bookmark</span>
+                </div>
+              </Button>
+              <Button className="h-[80px]">
+                <div className="flex flex-col items-center px-10 p-15">
+                  <QrCodeIcon />
+                  <span>QR code</span>
+                </div>
+              </Button>
             </div>
-          </Button>
-          <Button className="h-[80px]">
-            <div className="flex flex-col items-center px-10 p-15">
-              <QrCodeIcon />
-              <span>QR code</span>
-            </div>
-          </Button>
-        </div>
-        {balance !== null && (
-          <div
-            className="rounded-xl shadow-lg p-6 flex flex-row justify-between"
-            style={{ backgroundImage: `url(${background.src})` }}
-          >
-            <div className="flex flex-col items-start">
-              <div className="mt-10">
-                <h1 className="text-[4rem] leading-none font-bold">Your</h1>
-                <h1 className="text-[4rem] leading-none font-bold">Balance</h1>
-              </div>
-              <div className="mt-10">
-                <Badge className="text-lg">{url.hash}</Badge>
-              </div>
-            </div>
-            <div>
-              <div className="text-center mt-[5rem]">
-                <p className="text-pink-400">{balance.toFixed(4)} SOL</p>
-                {usdBalance !== null && (
-                  <h1 className="text-4xl">${usdBalance.toFixed(2)}</h1>
-                )}
-              </div>
-              <div className="flex justify-end mt-[5rem]">
-                <p className="text-gray-400 text-xs">POWERED BY Hyperlink</p>
-              </div>
-            </div>
-          </div>
-        )}
-        <div className="flex justify-center items-center gap-3">
-          <Button className="w-full">Send</Button>
-          <Button onClick={() => setShowQrModal(true)} className="w-full">
-            Receive
-          </Button>
-
-          {showQrModal && hyperlink?.keypair?.publicKey && (
-            <WalletModal
-              isVisible={showQrModal}
-              onClose={() => setShowQrModal(false)}
-              publicKey={hyperlink?.keypair?.publicKey.toBase58().toString()}
-            />
-          )}
-        </div>
-        <Separator className="my-10" />
-        <div className="flex w-full flex-col justify-start space-y-5 xs:space-y-0 xs:flex-row xs:space-x-10">
-          <Button
-            onClick={createLinkAndTransfer}
-            className="flex justify-between text-base font-medium p-10 xs:w-full xs:text-base"
-          >
-            <div className="flex items-start justify-start gap-[10px]">
-              <div className="flex items-center justify-center align-middle mt-2 rounded-full bg-grey-50 xs:p-3">
-                <Wallet />
-              </div>
-              <div className="flex-col items-start justify-start rounded-full bg-grey-50 xs:p-3">
-                <div className="text-left">Recreate this Hyperlink</div>
-                <div className="text-left text-xs font-normal text-grey-500">
-                  Move the entire value to a new Hyperlink so only you have the
-                  link.
+            {balance !== null && (
+              <div
+                className="rounded-xl shadow-lg p-6 flex flex-row justify-between"
+                style={{ backgroundImage: `url(${background.src})` }}
+              >
+                <div className="flex flex-col items-start">
+                  <div className="mt-10">
+                    <h1 className="text-[4rem] leading-none font-bold">Your</h1>
+                    <h1 className="text-[4rem] leading-none font-bold">
+                      Balance
+                    </h1>
+                  </div>
+                  <div className="mt-10">
+                    <Badge className="text-lg">{url.hash}</Badge>
+                  </div>
+                </div>
+                <div>
+                  <div className="text-center mt-[5rem]">
+                    <p className="text-pink-400">{balance.toFixed(4)} SOL</p>
+                    {usdBalance !== null && (
+                      <h1 className="text-4xl">${usdBalance.toFixed(2)}</h1>
+                    )}
+                  </div>
+                  <div className="flex justify-end mt-[5rem]">
+                    <p className="text-gray-400 text-xs">
+                      POWERED BY Hyperlink
+                    </p>
+                  </div>
                 </div>
               </div>
+            )}
+            <div className="flex justify-center items-center gap-3">
+              <Button onClick={() => setStep(1)} className="w-full">
+                Send
+              </Button>
+              <Button onClick={() => setShowQrModal(true)} className="w-full">
+                Receive
+              </Button>
+
+              {showQrModal && hyperlink?.keypair?.publicKey && (
+                <WalletModal
+                  isVisible={showQrModal}
+                  onClose={() => setShowQrModal(false)}
+                  publicKey={hyperlink?.keypair?.publicKey
+                    .toBase58()
+                    .toString()}
+                />
+              )}
             </div>
-            {isLoading ? <Spinner /> : <ChevronRight />}
-          </Button>
-          <Button
-            onClick={handleTransfer}
-            className="flex justify-between text-base font-medium p-10 xs:w-full xs:text-base"
-          >
-            <div className="flex items-start justify-start gap-[10px]">
-              <div className="flex items-center justify-center align-middle mt-2 rounded-full bg-grey-50 xs:p-3">
-                <Wallet />
-              </div>
-              <div className="flex-col items-start justify-start rounded-full bg-grey-50 xs:p-3">
-                <div className="text-left">Withdraw to your wallet</div>
-                <div className="text-left text-xs font-normal text-grey-500">
-                  Withdraw the entire value to your connected wallet.
-                </div>
-              </div>
-            </div>
-            <ChevronRight />
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+            <Separator className="my-10" />
+            <div>{handleSteps(step)}</div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 };
 
