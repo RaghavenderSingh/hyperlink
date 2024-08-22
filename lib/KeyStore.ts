@@ -23,7 +23,7 @@ export const getPrivateKey = () => {
 export const getPublicKey = () => {
 
     if (publicKey === null) {
-        throw new Error("Public key is not set");
+        return ("Public key is not set");
     }
     else {
         return publicKey;

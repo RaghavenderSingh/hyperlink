@@ -55,6 +55,7 @@ const CustomTextField = ({ setAmount }: setAmountProps) => {
   const updateSolValue = async (usdValue: string) => {
     if (usdValue === "" || parseFloat(usdValue) === 0) {
       setSolValue("0");
+      setAmount("");
       return;
     }
     const outputMint = "So11111111111111111111111111111111111111112";
@@ -67,12 +68,12 @@ const CustomTextField = ({ setAmount }: setAmountProps) => {
 
       const response = await fetch(url);
       const data = await response.json();
-      setAmount(data.outAmount);
+      setAmount(data.outAmount.toString());
       setSolValue((data.outAmount / LAMPORTS_PER_SOL).toFixed(4));
-      console.log(data);
     } catch (error) {
       console.error("Error fetching SOL value:", error);
       setSolValue("Error");
+      setAmount("0");
     }
   };
 
