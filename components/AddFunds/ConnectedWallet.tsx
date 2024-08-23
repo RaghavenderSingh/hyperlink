@@ -9,17 +9,24 @@ import CustomTextField from "../CustomTextField";
 import { Button } from "../ui/button";
 import { useTransferSOL } from "@/app/hooks/useTransferSOL";
 import { getPublicKey } from "@/lib/KeyStore";
+import BouncingDotsLoader from "../BouncingDotsLoader";
 
 type FundingOptionsProps = {
   setStep: (value: number) => void;
+  handleDeposit: () => void;
+  setAddAmount: (value: string) => void;
+  loading: boolean;
 };
 
-export default function ConnectedWallet({ setStep }: FundingOptionsProps) {
-  const { publicKey, sendTransaction, wallets } = useWallet();
-  const { transferSOL, isTransferring, error } = useTransferSOL();
+export default function ConnectedWallet({
+  setStep,
+  handleDeposit,
+  setAddAmount,
+  loading,
+}: FundingOptionsProps) {
+  const { publicKey } = useWallet();
   const [balance, setBalance] = useState(0);
   const { connection } = useConnection();
-  const [amount, setAmount] = useState("");
   useEffect(() => {
     if (!connection || !publicKey) {
       return;
@@ -40,23 +47,14 @@ export default function ConnectedWallet({ setStep }: FundingOptionsProps) {
       setBalance(info.lamports / LAMPORTS_PER_SOL);
     });
   }, [connection, publicKey]);
-  const handleDeposit = async () => {
-    if (!publicKey) {
-      return;
-    }
-    const amt = Number(amount);
 
-    await transferSOL(getPublicKey(), amt);
+  console.log("loading", loading);
 
-    setStep(0);
-  };
-  console.log("balance", balance, publicKey);
-  console.log("sss", isTransferring, error);
   return (
     <div>
       <div className="py-5">
         <div
-          onClick={() => setStep(2)}
+          onClick={() => setStep(3)}
           className="mb-3.5 mr-auto flex w-max cursor-pointer items-center justify-start gap-1 text-sm font-semibold text-grey-700 hover:opacity-70"
         >
           <span>
@@ -87,11 +85,13 @@ export default function ConnectedWallet({ setStep }: FundingOptionsProps) {
           </div>
           <div>
             <div>
-              <CustomTextField setAmount={setAmount} />
+              <CustomTextField setAmount={setAddAmount} />
             </div>
             <div className="flex justify-between mt-4">
-              <Button variant={"outline"}>Cancel</Button>
-              <Button onClick={handleDeposit}>Deposit</Button>
+              <Button onClick={() => setStep(0)}>Cancel</Button>
+              <Button disabled={loading} onClick={handleDeposit}>
+                {loading ? <BouncingDotsLoader /> : "Deposit"}
+              </Button>
             </div>
           </div>
         </div>

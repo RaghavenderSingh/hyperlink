@@ -23,10 +23,8 @@ export default function RootLayout({
       <body className={inter.className}>
         <WagmiWrapper>
           <AppWalletProvider>
-            <SolanaWalletProvider>
-              {children}
-              <Toaster />
-            </SolanaWalletProvider>
+            {children}
+            <Toaster />
           </AppWalletProvider>
         </WagmiWrapper>
       </body>

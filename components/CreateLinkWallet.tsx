@@ -16,6 +16,7 @@ import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import LinkPopup from "./LinkPopup";
 import { ShieldCheck } from "lucide-react";
+import { convertUsdToSol } from "@/lib/KeyStore";
 
 export default function CreateLinkWallet() {
   const [amount, setAmount] = useState("0");
@@ -47,7 +48,8 @@ export default function CreateLinkWallet() {
         "https://api.devnet.solana.com",
         "confirmed"
       );
-      const amountLamports = parseInt(amount); // amount is already in lamports from CustomTextField
+      const amt = await convertUsdToSol(amount);
+      const amountLamports = parseInt(amt);
       console.log("amountLamports", amountLamports);
       const transaction = new Transaction().add(
         SystemProgram.transfer({
