@@ -11,10 +11,11 @@ import Image from "next/image";
 
 interface IHeader {
   signIn: () => Promise<void>;
+  loading: boolean;
 }
 
 export default function Header(props: IHeader) {
-  const { signIn } = props;
+  const { signIn, loading } = props;
   const { connected } = useWallet();
   return (
     <div>

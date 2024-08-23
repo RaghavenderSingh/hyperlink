@@ -22,7 +22,7 @@ export default function FundingOptions({ setStep }: FundingOptionsProps) {
           Add funds
         </h4>
         <div className="flex w-full flex-col  justify-start space-y-5 xs:space-y-0 xs:flex-row xs:space-x-10">
-          <Button
+          {/* <Button
             disabled
             className="flex  justify-between text-lg font-medium p-10 xs:w-full xs:text-base"
           >
@@ -41,9 +41,9 @@ export default function FundingOptions({ setStep }: FundingOptionsProps) {
             <div>
               <ChevronRight />
             </div>
-          </Button>
+          </Button> */}
           <Button
-            onClick={() => setStep(2)}
+            onClick={() => setStep(4)}
             className="flex  justify-between text-lg font-medium p-10 xs:w-full xs:text-base"
           >
             <div className="flex items-start  justify-start gap-[10px] ">

@@ -7,25 +7,24 @@ import WithdrawlInput from "./WithdrawlInput";
 import { set } from "@project-serum/anchor/dist/cjs/utils/features";
 import { useSolanaTransfer } from "@/app/hooks/useSolanaTransfer";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { toast } from "sonner";
+import BouncingDotsLoader from "../BouncingDotsLoader";
+import { useTokens } from "@/app/hooks/useTokens";
+import { steps } from "framer-motion";
 type FundingOptionsProps = {
   setStep: (value: number) => void;
+  balance: number;
+  setAmount: (value: string) => void;
+  handleTransfer: () => void;
+  loading: boolean;
 };
-export default function WalletWithdraw({ setStep }: FundingOptionsProps) {
-  const [amount, setAmount] = useState("");
-  const [balance, setBalance] = useState(0);
-  const { transferAsset, transferStatus, isTransferring } = useSolanaTransfer();
-  const { publicKey } = useWallet();
-  const [recipientAddress, setRecipientAddress] = useState(
-    publicKey?.toBase58()
-  );
-  const handleTransfer = async () => {
-    console.log("handleTransfer", recipientAddress, amount);
-    if (!recipientAddress || !amount) {
-      alert("Please fill in all fields");
-      return;
-    }
-    await transferAsset(recipientAddress, parseFloat(amount));
-  };
+export default function WalletWithdraw({
+  setStep,
+  balance,
+  setAmount,
+  handleTransfer,
+  loading,
+}: FundingOptionsProps) {
   return (
     <div>
       <div>
@@ -56,7 +55,7 @@ export default function WalletWithdraw({ setStep }: FundingOptionsProps) {
                 TipLink's available SOL:{" "}
               </span>
               <span className="text-sm font-bold text-grey-700">
-                {balance ? balance.toFixed(2) : "0.00"}
+                {balance ? balance : "0.00"}
                 {" SOL"}
               </span>
             </div>
@@ -68,7 +67,9 @@ export default function WalletWithdraw({ setStep }: FundingOptionsProps) {
                 <Button onClick={() => setStep(0)} variant={"outline"}>
                   Cancel
                 </Button>
-                <Button onClick={handleTransfer}>Withdraw</Button>
+                <Button onClick={handleTransfer}>
+                  {loading ? <BouncingDotsLoader /> : "Withdraw"}
+                </Button>
               </div>
             </div>
           </div>

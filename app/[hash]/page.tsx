@@ -285,12 +285,6 @@ const HyperLinkCard: React.FC = () => {
             </Button>
           </div>
         );
-      // case 3:
-      //   return <ToAddress />;
-      // default:
-      //   return <BankCard />;
-      case 4:
-        return;
     }
   };
 

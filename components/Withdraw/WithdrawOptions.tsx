@@ -11,7 +11,7 @@ import { Button } from "../ui/button";
 type FundingOptionsProps = {
   setStep: (value: number) => void;
 };
-export default function Options({ setStep }: FundingOptionsProps) {
+export default function WithdrawOptions({ setStep }: FundingOptionsProps) {
   const { wallet } = useWallet();
   console.log("wallet", wallet?.adapter.name, wallet?.adapter?.icon);
   return (

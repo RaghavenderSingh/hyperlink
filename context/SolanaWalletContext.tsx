@@ -16,8 +16,7 @@ interface IProps {
 
 export const SolanaWalletProvider = ({ children }: IProps) => {
   // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'.
-  const network =
-    process.env.NEXT_PUBLIC_SOLANA_RPC_URL || clusterApiUrl("devnet");
+  const network = clusterApiUrl("devnet");
 
   // You can also provide a custom RPC endpoint.
   const endpoint = useMemo(() => network, [network]);

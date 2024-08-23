@@ -1,14 +1,23 @@
 import { useTokens } from "@/app/hooks/useTokens";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Wallet } from "lucide-react";
 import WalletModal from "./WalletModal";
 import { Skeleton } from "./ui/skeleton";
+import { toast } from "sonner";
 
-export default function Assets({ publicKey }: { publicKey: string }) {
+export default function Assets({
+  publicKey,
+  tokenBalances,
+}: {
+  publicKey: string;
+  tokenBalances: any;
+  loading: boolean;
+}) {
   const [copied, setCopied] = useState(false);
-  const { tokenBalances, loading } = useTokens(publicKey);
+
   const [showModal, setShowModal] = useState(false);
+  const [walletbalance, setWalletbalance] = useState(0);
 
   useEffect(() => {
     if (copied) {
@@ -20,7 +29,12 @@ export default function Assets({ publicKey }: { publicKey: string }) {
       };
     }
   }, [copied]);
-
+  useEffect(() => {
+    if (tokenBalances) {
+      setWalletbalance(tokenBalances.totalBalance);
+    }
+  }, [tokenBalances]);
+  console.log("tokenBalances", tokenBalances);
   return (
     <>
       <div className="text-slate-500 mt-4 ">
@@ -35,7 +49,7 @@ export default function Assets({ publicKey }: { publicKey: string }) {
           <div className="flex">
             <div className="text-5xl font-bold text-black">
               {tokenBalances?.totalBalance ? (
-                `${tokenBalances?.totalBalance}`
+                walletbalance
               ) : (
                 <Skeleton className="h-50 w-[250px]" />
               )}

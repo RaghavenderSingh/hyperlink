@@ -1,7 +1,7 @@
 "use client";
 import Header from "@/components/header/page";
 import Hero from "@/components/Hero";
-import Wallet from "@/components/Wallet";
+import Wallet from "@/components/wallet/Wallet";
 import WalletNav from "@/components/WalletNav";
 import { useState, useEffect } from "react";
 import {
@@ -207,7 +207,7 @@ export default function Home() {
         <Wallet
           name={user?.name}
           profileImage={user?.profileImage}
-          publicKey={walletAddress}
+          hyperPublicKey={walletAddress}
         />
       </div>
     </div>

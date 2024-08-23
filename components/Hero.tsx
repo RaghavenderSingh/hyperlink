@@ -33,7 +33,9 @@ const Hero = (props: IHeader) => {
         <div className="flex gap-3 items-center justify-center mt-5">
           <Button onClick={signIn} className="pl-2 py-6 text-sm md:text-base">
             {loading ? (
-              <BouncingDotsLoader />
+              <div>
+                <BouncingDotsLoader />
+              </div>
             ) : (
               <span className="flex items-center gap-2">
                 <div className="px-3 py-2 rounded-lg border bg-white text-black">

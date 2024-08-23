@@ -28,7 +28,7 @@ export default function ExternalAccount({ setStep }: FundingOptionsProps) {
         </p>
         <div className="flex w-full flex-col  justify-start space-y-5 xs:space-y-0 xs:flex-row xs:space-x-10">
           <Button
-            onClick={() => setStep(4)}
+            onClick={() => setStep(5)}
             className="flex  justify-between text-base font-medium p-10 xs:w-full xs:text-base"
           >
             <div className="flex items-start  justify-start gap-[10px] ">
@@ -47,7 +47,7 @@ export default function ExternalAccount({ setStep }: FundingOptionsProps) {
               <ChevronRight />
             </div>
           </Button>
-          <Button className="flex  justify-between text-base font-medium p-10 xs:w-full xs:text-base">
+          {/* <Button className="flex  justify-between text-base font-medium p-10 xs:w-full xs:text-base">
             <div className="flex items-start  justify-start gap-[10px] ">
               <div className="flex items-center justify-center align-middle mt-2 rounded-full bg-grey-50  xs:p-3">
                 <Image src={coinbase.src} alt="" width={25} height={25} />
@@ -63,7 +63,7 @@ export default function ExternalAccount({ setStep }: FundingOptionsProps) {
             <div>
               <ChevronRight />
             </div>
-          </Button>
+          </Button> */}
         </div>
       </div>
     </div>

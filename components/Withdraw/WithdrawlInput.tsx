@@ -35,7 +35,12 @@ const CustomTextField = ({ setAmount }: setAmountProps) => {
 
   const handleInputBlur = () => {
     setIsEditing(false);
-    setValue(formatValue(value));
+    const formattedValue = formatValue(value);
+    setValue(formattedValue);
+    if (formattedValue === "") {
+      setAmount("0");
+      setSolValue("0");
+    }
   };
 
   const handleToggle = () => {
@@ -45,6 +50,7 @@ const CustomTextField = ({ setAmount }: setAmountProps) => {
   const updateSolValue = async (usdValue: string) => {
     if (usdValue === "" || parseFloat(usdValue) === 0) {
       setSolValue("0");
+      setAmount("0");
       return;
     }
     const outputMint = "So11111111111111111111111111111111111111112";
@@ -59,7 +65,6 @@ const CustomTextField = ({ setAmount }: setAmountProps) => {
       const data = await response.json();
       setAmount(data.outAmount);
       setSolValue((data.outAmount / LAMPORTS_PER_SOL).toFixed(4));
-      console.log(data);
     } catch (error) {
       console.error("Error fetching SOL value:", error);
       setSolValue("Error");
@@ -79,7 +84,7 @@ const CustomTextField = ({ setAmount }: setAmountProps) => {
     }
   }, [value]);
 
-  const isZeroValue = parseFloat(value) === 0 || value === "";
+  const isZeroValue = value === "";
 
   return (
     <div className="relative mx-auto my-0 w-full">
