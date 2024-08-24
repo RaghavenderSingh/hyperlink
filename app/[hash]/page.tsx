@@ -25,13 +25,17 @@ import {
 import { HyperLink } from "@/utils/url";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
-import { Spinner } from "flowbite-react";
+import { Spinner, Tooltip } from "flowbite-react";
 import WalletModal from "@/components/WalletModal";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useSolanaTransfer } from "@/app/hooks/useSolanaTransfer";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import Send from "@/components/linkAsWallet/Send";
 import SendHyperlink from "@/components/linkAsWallet/SendHyperlink";
+import { convertUsdToSol } from "@/lib/KeyStore";
+import { Input } from "@/components/ui/input";
+import { LinkPreview } from "@/components/ui/link-preview";
+import preview from "../../public/assets/images/preview.png";
 
 interface HyperLinkData {
   keypair: {
@@ -51,6 +55,7 @@ const HyperLinkCard: React.FC = () => {
   const [showQrModal, setShowQrModal] = useState<boolean>(false);
   const [step, setStep] = useState<Number>(0);
   const [transferAmount, setTransferAmount] = useState<string>("");
+  const [recipentPublicKey, setRecipentPublicKey] = useState<string>("");
 
   const { publicKey, connected } = useWallet();
 
@@ -112,8 +117,31 @@ const HyperLinkCard: React.FC = () => {
       );
     }
   };
+  const completeAmount = async () => {
+    if (!hyperlink) {
+      setError("No HyperLink available to transfer from.");
+      return;
+    }
+    const connection = new Connection(
+      "https://api.devnet.solana.com",
+      "confirmed"
+    );
+    const currentBalance = await connection.getBalance(
+      hyperlink.keypair.publicKey
+    );
+    createLinkAndTransfer({ amount: currentBalance });
+  };
+  const handleTransferAmount = async () => {
+    if (!hyperlink) {
+      setError("No HyperLink available to transfer from.");
+      return;
+    }
+    const amt = await convertUsdToSol(transferAmount);
+    const amount = Number(amt) * LAMPORTS_PER_SOL;
+    createLinkAndTransfer({ amount: amount });
+  };
 
-  const createLinkAndTransfer = async () => {
+  const createLinkAndTransfer = async ({ amount }: { amount: number }) => {
     if (!hyperlink) {
       setError("No HyperLink available to transfer from.");
       return;
@@ -121,14 +149,12 @@ const HyperLinkCard: React.FC = () => {
 
     try {
       setIsLoading(true);
-      const newHyperlink = await HyperLink.create(0);
+      const newHyperlink = await HyperLink.create();
       const connection = new Connection(
         "https://api.devnet.solana.com",
         "confirmed"
       );
-      const currentBalance = await connection.getBalance(
-        hyperlink.keypair.publicKey
-      );
+      const currentBalance = amount;
       const { blockhash, lastValidBlockHeight } =
         await connection.getLatestBlockhash();
 
@@ -169,18 +195,45 @@ const HyperLinkCard: React.FC = () => {
       await fetchBalance(newHyperlink);
       setUrl(new URL(newHyperlink.url));
       window.open(newHyperlink.url.toString(), "_blank");
+      console.log("newHyperlink", newHyperlink);
       setIsLoading(false);
     } catch (err) {
       console.error("Error:", err);
       setError(`Error creating new HyperLink or transferring funds: ${err}`);
     }
   };
-  const handleTransfer = async () => {
+  const handleTransferToPublickkey = async () => {
+    console.log(recipentPublicKey, transferAmount);
+    if (!recipentPublicKey || transferAmount === "") {
+      toast.error("Missing required information for transfer.");
+      return;
+    }
+    try {
+      const publicKey = new PublicKey(recipentPublicKey);
+      publicKey.toBytes().length === 32;
+      const amt = await convertUsdToSol(transferAmount);
+      const amount = Number(amt) * LAMPORTS_PER_SOL;
+      console.log(publicKey, amount, transferAmount);
+      handleTransfer(publicKey, amount);
+    } catch (error) {
+      toast.error("Invalid public key");
+      return false;
+    }
+  };
+  const handleTransferToPersonalWallet = async () => {
     if (!publicKey || !balance || !hyperlink) {
       toast.error("Missing required information for transfer.");
       return;
     }
-
+    const amount = balance * LAMPORTS_PER_SOL;
+    handleTransfer(publicKey, amount);
+  };
+  const handleTransfer = async (publicKey: PublicKey, amount: number) => {
+    if (!publicKey || !balance || !hyperlink) {
+      toast.error("Missing required information for transfer.");
+      return;
+    }
+    console.log("balance", balance);
     setIsLoading(true);
 
     try {
@@ -188,7 +241,7 @@ const HyperLinkCard: React.FC = () => {
         "https://api.devnet.solana.com",
         "confirmed"
       );
-      const amount = balance * LAMPORTS_PER_SOL;
+
       const transaction = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey: hyperlink.keypair.publicKey,
@@ -196,13 +249,10 @@ const HyperLinkCard: React.FC = () => {
           lamports: amount - 5000,
         })
       );
-      const { blockhash, lastValidBlockHeight } =
-        await connection.getLatestBlockhash();
+      const { blockhash } = await connection.getLatestBlockhash();
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = hyperlink.keypair.publicKey;
-      // Sign the transaction
       transaction.sign(hyperlink.keypair);
-      // Send and confirm the transaction
       const signature = await sendAndConfirmTransaction(
         connection,
         transaction,
@@ -213,6 +263,8 @@ const HyperLinkCard: React.FC = () => {
       toast.success(`Transfer successful! Signature: ${signature}`);
 
       await fetchBalance(hyperlink);
+      setRecipentPublicKey("");
+      setTransferAmount("");
     } catch (error) {
       console.error("Transfer error:", error);
       toast.error(
@@ -224,14 +276,14 @@ const HyperLinkCard: React.FC = () => {
       setIsLoading(false);
     }
   };
-  console.log("transferAmount", transferAmount);
+
   const handleSteps = (step: Number) => {
     switch (step) {
       case 0:
         return (
           <div className="flex w-full flex-col justify-start space-y-5 xs:space-y-0 xs:flex-row xs:space-x-10">
             <Button
-              onClick={createLinkAndTransfer}
+              onClick={completeAmount}
               className="flex justify-between text-base font-medium p-10 xs:w-full xs:text-base"
             >
               <div className="flex items-start justify-start gap-[10px]">
@@ -248,8 +300,8 @@ const HyperLinkCard: React.FC = () => {
               </div>
               {isLoading ? <Spinner /> : <ChevronRight />}
             </Button>
-            <Button
-              onClick={handleTransfer}
+            <Button //TODO
+              onClick={handleTransferToPersonalWallet}
               className="flex justify-between text-base font-medium p-10 xs:w-full xs:text-base"
             >
               <div className="flex items-start justify-start gap-[10px]">
@@ -279,7 +331,30 @@ const HyperLinkCard: React.FC = () => {
             <Button
               className="mt-1 w-full"
               disabled={transferAmount === "" ? true : false}
-              onClick={() => console.log("transferAmount", transferAmount)}
+              onClick={() => handleTransferAmount()}
+            >
+              Send
+            </Button>
+          </div>
+        );
+
+      case 3:
+        return (
+          <div>
+            <SendHyperlink
+              setStep={setStep}
+              setTransferAmount={setTransferAmount}
+            />
+            <Input
+              onChange={(e) => setRecipentPublicKey(e.target.value)}
+              placeholder="Public Key"
+              className="mt-10"
+              value={recipentPublicKey}
+            />
+            <Button
+              className="mt-1 w-full"
+              disabled={transferAmount === "" ? true : false}
+              onClick={() => handleTransferToPublickkey()}
             >
               Send
             </Button>
@@ -307,7 +382,10 @@ const HyperLinkCard: React.FC = () => {
   //     </Card>
   //   );
   // }
-
+  const truncateUrl = (urlString: string, length: number = 16) => {
+    if (urlString.length <= length) return urlString;
+    return urlString.substring(0, length) + "...";
+  };
   return (
     <div className="flex flex-col  m-1">
       <div className="fixed top-4 right-4 flex items-end justify-end z-10">
@@ -329,7 +407,18 @@ const HyperLinkCard: React.FC = () => {
               lose it!
             </p>
             <div className="flex justify-center items-center">
-              <Badge className="text-lg p-2 px-4">{url.href}</Badge>
+              <LinkPreview
+                isStatic
+                imageSrc="/assets/images/preview.png"
+                url={url.href}
+              >
+                <Badge
+                  onClick={handleCopy}
+                  className="text-lg p-2 px-4 cursor-pointer"
+                >
+                  {truncateUrl(url.href, 32)}
+                </Badge>
+              </LinkPreview>
             </div>
             <div className="flex justify-center items-center gap-3">
               <Button onClick={handleCopy} className="h-[80px]">
@@ -364,7 +453,14 @@ const HyperLinkCard: React.FC = () => {
                     </h1>
                   </div>
                   <div className="mt-10">
-                    <Badge className="text-lg">{url.hash}</Badge>
+                    <Tooltip
+                      className="bg-black text-white rounded-full"
+                      content={url.hash}
+                    >
+                      <Badge onClick={handleCopy} className="text-lg">
+                        {truncateUrl(url.hash)}
+                      </Badge>
+                    </Tooltip>
                   </div>
                 </div>
                 <div>

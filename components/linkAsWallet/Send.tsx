@@ -36,7 +36,7 @@ export default function ({ setStep }: FundingOptionsProps) {
           <ChevronRight />
         </Button>
         <Button
-          // onClick={handleTransfer}
+          onClick={() => setStep(3)}
           className="flex justify-between text-base font-medium p-10 xs:w-full xs:text-base"
         >
           <div className="flex items-start justify-start gap-[10px]">

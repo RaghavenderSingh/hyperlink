@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, ChangeEvent } from "react";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { convertUsdToSol } from "@/lib/KeyStore";
 
 type setAmountProps = {
   setAmount: (value: string) => void;
@@ -22,11 +23,13 @@ const CustomTextField = ({ setAmount }: setAmountProps) => {
     return numericValue.toString();
   };
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value.replace(/[^0-9.]/g, "");
+    setAmount(newValue);
     setValue(newValue);
     setCursorPosition(e.target.selectionStart || 0);
-    updateSolValue(newValue);
+    const sol = await convertUsdToSol(newValue);
+    setSolValue(sol);
   };
 
   const handleInputFocus = () => {
@@ -38,37 +41,12 @@ const CustomTextField = ({ setAmount }: setAmountProps) => {
     const formattedValue = formatValue(value);
     setValue(formattedValue);
     if (formattedValue === "") {
-      setAmount("0");
       setSolValue("0");
     }
   };
 
   const handleToggle = () => {
     setIsFlipped(!isFlipped);
-  };
-
-  const updateSolValue = async (usdValue: string) => {
-    if (usdValue === "" || parseFloat(usdValue) === 0) {
-      setSolValue("0");
-      setAmount("0");
-      return;
-    }
-    const outputMint = "So11111111111111111111111111111111111111112";
-    const inputMint = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"; // USDC
-    // Convert amount to smallest unit (USDC is 6 decimals, so multiply by 1e6)
-    const amount = (Number(usdValue) * 1e6).toString();
-
-    try {
-      const url = `https://quote-api.jup.ag/v6/quote?inputMint=${inputMint}&outputMint=${outputMint}&amount=${amount}`;
-
-      const response = await fetch(url);
-      const data = await response.json();
-      setAmount(data.outAmount);
-      setSolValue((data.outAmount / LAMPORTS_PER_SOL).toFixed(4));
-    } catch (error) {
-      console.error("Error fetching SOL value:", error);
-      setSolValue("Error");
-    }
   };
 
   useEffect(() => {

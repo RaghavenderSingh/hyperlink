@@ -15,8 +15,8 @@ import CustomTextField from "./CustomTextField";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import LinkPopup from "./LinkPopup";
-import { ShieldCheck } from "lucide-react";
 import { convertUsdToSol } from "@/lib/KeyStore";
+import BouncingDotsLoader from "./BouncingDotsLoader";
 
 export default function CreateLinkWallet() {
   const [amount, setAmount] = useState("0");
@@ -25,8 +25,7 @@ export default function CreateLinkWallet() {
   const { connected, publicKey, sendTransaction } = useWallet();
   const [linkPopupOpen, setLinkPopupOpen] = useState(false);
   const [signature, setSignature] = useState("");
-  const router = useRouter();
-  console.log("link", 6975763 / LAMPORTS_PER_SOL, amount);
+  const [isLoading, setIsLoading] = useState(false);
   const handleSelection = (selectedOption: any) => {
     console.log("Selected option:", selectedOption);
     // Handle the selected option here
@@ -40,7 +39,8 @@ export default function CreateLinkWallet() {
 
     try {
       // Create HyperLink
-      const hyperlink = await HyperLink.create(0);
+      setIsLoading(true);
+      const hyperlink = await HyperLink.create();
       const hyperlinkUrl = hyperlink.url.toString();
 
       // Transfer funds
@@ -49,13 +49,13 @@ export default function CreateLinkWallet() {
         "confirmed"
       );
       const amt = await convertUsdToSol(amount);
-      const amountLamports = parseInt(amt);
-      console.log("amountLamports", amountLamports);
+      const lamports = BigInt(Math.round(Number(amt) * LAMPORTS_PER_SOL));
+      console.log("amt", amt, lamports);
       const transaction = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey: publicKey,
           toPubkey: new PublicKey(hyperlink.keypair.publicKey),
-          lamports: amountLamports,
+          lamports: BigInt(Number(amt) * LAMPORTS_PER_SOL),
         })
       );
 
@@ -66,9 +66,12 @@ export default function CreateLinkWallet() {
       setGeneratedLink(hyperlinkUrl);
       setSignature(signature);
       setGeneratedLink(hyperlinkUrl);
+      setIsLoading(false);
       console.log("Transfer successful. Signature:", signature);
       setError("");
+      setAmount("0");
     } catch (err) {
+      setIsLoading(false);
       console.error("Error:", err);
       setError("Error creating HyperLink or transferring funds.");
     }
@@ -103,11 +106,11 @@ export default function CreateLinkWallet() {
         <CustomTextField setAmount={setAmount} />
 
         <Button
-          disabled={!connected}
+          disabled={!connected || isLoading}
           onClick={createLinkAndTransfer}
           className="w-full"
         >
-          Create Hyperlink and Transfer
+          {isLoading ? <BouncingDotsLoader /> : "Create Hyperlink and Transfer"}
         </Button>
 
         {error && <p className="text-red-500 text-sm">{error}</p>}
@@ -117,6 +120,7 @@ export default function CreateLinkWallet() {
         linkPopupOpen={linkPopupOpen}
         link={generatedLink}
         signature={signature}
+        setLinkPopupOpen={setLinkPopupOpen}
       />
     </div>
   );
