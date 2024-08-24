@@ -22,7 +22,7 @@ export const useTransferSOL = () => {
 
             const recipient = new PublicKey(destinationAddress);
             const lamports = amount; // Convert SOL to lamports (1 SOL = 1e9 lamports)
-
+            console.log("Transferring SOL...", destinationAddress, lamports);
             const transaction = new Transaction().add(
                 SystemProgram.transfer({
                     fromPubkey: publicKey,

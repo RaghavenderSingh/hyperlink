@@ -35,7 +35,7 @@ export default function Wallet({
   const [recipientAddress, setRecipientAddress] = useState(
     publicKey?.toBase58()
   );
-  const { transferSOL, isTransferring, error } = useTransferSOL();
+  const { transferSOL } = useTransferSOL();
 
   const fetchTokenBalances = useCallback(async () => {
     setIsLoading(true);
@@ -77,25 +77,35 @@ export default function Wallet({
   };
 
   const handleDeposit = async () => {
-    if (!publicKey) {
-      toast.error("Please connect your wallet");
-      return;
-    }
-    if (addAmount === "0") {
-      toast.error("No amount specified");
-      return;
-    }
+    try {
+      if (!publicKey) {
+        toast.error("Please connect your wallet");
+        return;
+      }
+      if (addAmount === "0") {
+        toast.error("No amount specified");
+        return;
+      }
 
-    const amt = Number(await convertUsdToSol(addAmount));
-    console.log("amt", amt);
-    setLoading(true);
-    await transferSOL(hyperPublicKey, amt * LAMPORTS_PER_SOL);
+      setLoading(true);
 
-    setStep(3);
-    setLoading(false);
-    toast.success(`Transfer successful $${amt} added`);
-    setAddAmount("0");
-    fetchTokenBalances(); // Update balances after deposit
+      const amt = Number(await convertUsdToSol(addAmount));
+      console.log("amt", amt);
+
+      await transferSOL(hyperPublicKey, amt * LAMPORTS_PER_SOL);
+
+      setStep(3);
+      toast.success(`Transfer successful $${amt} added`);
+      setAddAmount("0");
+      await fetchTokenBalances(); // Update balances after deposit
+    } catch (error) {
+      console.error("Error during deposit:", error);
+      toast.error("An error occurred during the deposit");
+      await fetchTokenBalances();
+    } finally {
+      setLoading(false);
+      await fetchTokenBalances();
+    }
   };
   const handleTransferToPublickkey = async () => {
     console.log(recipentPublicKey, amount);
