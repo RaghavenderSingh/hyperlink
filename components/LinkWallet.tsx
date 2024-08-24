@@ -1,13 +1,7 @@
-"use client";
 import CreateLinkWallet from "@/components/CreateLinkWallet";
-import Header from "@/components/header/page";
 import { Button } from "@/components/ui/button";
-import { web3AuthClientId } from "@/constants";
-import { CHAIN_NAMESPACES, WALLET_ADAPTERS } from "@web3auth/base";
-import { Web3AuthNoModal } from "@web3auth/no-modal";
 import { ShieldCheck } from "lucide-react";
-import React, { use, useEffect, useState } from "react";
-import { FaGoogle, FaSquareGooglePlus } from "react-icons/fa6";
+import { FaGoogle } from "react-icons/fa6";
 
 export default function LinkWallet() {
   return (
@@ -57,22 +51,17 @@ export default function LinkWallet() {
           </div>
         </div>
       </div>
-      <div className=" flex items-center justify-center">
-        <p className="text-sm text-gray-500 flex items-center gap-1">
-          <span>
-            <div>
-              <p className="text-sm text-gray-500 flex items-center gap-1">
-                <span>
-                  <ShieldCheck />
-                </span>
-                <span>
-                  All Hyperlinks are non-custodial wallets. HyperLink does not
-                  and cannot access your digital assets.
-                </span>
-              </p>
-            </div>
-          </span>
-        </p>
+
+      <div>
+        <div className="flex items-center justify-center">
+          <div className="text-sm text-gray-500 flex items-center gap-1">
+            <ShieldCheck />
+            <span>
+              All Hyperlinks are non-custodial wallets. HyperLink does not and
+              cannot access your digital assets.
+            </span>
+          </div>
+        </div>
       </div>
     </main>
   );

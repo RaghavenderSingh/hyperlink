@@ -66,8 +66,8 @@ export default function Wallet({
       return;
     }
     setLoading(true);
-
-    await transferAsset(recipientAddress, parseFloat(amount));
+    const amt = Number(await convertUsdToSol(amount));
+    await transferAsset(recipientAddress, amt * LAMPORTS_PER_SOL);
     toast.success("Transfer successful");
     setAmount("0");
     fetchTokenBalances(); // Update balances after transfer

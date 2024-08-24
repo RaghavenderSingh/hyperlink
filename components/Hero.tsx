@@ -11,10 +11,11 @@ import BouncingDotsLoader from "./BouncingDotsLoader";
 interface IHeader {
   signIn: () => Promise<void>;
   loading: boolean;
+  scrollElement: () => void;
 }
 
 const Hero = (props: IHeader) => {
-  const { signIn, loading } = props;
+  const { signIn, loading, scrollElement } = props;
   return (
     <section className="items-center  mt-18">
       <div className="container mx-auto px-4">
@@ -45,7 +46,10 @@ const Hero = (props: IHeader) => {
               </span>
             )}
           </Button>
-          <Button className="pl-2 py-6 text-sm md:text-base">
+          <Button
+            onClick={scrollElement}
+            className="pl-2 py-6 text-sm md:text-base"
+          >
             <span className="flex items-center gap-2">
               <div className="px-[6px] py-[7px] rounded-lg border bg-white text-black">
                 <Image src={logo} alt="logo" width={32} height={32} />

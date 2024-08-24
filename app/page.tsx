@@ -3,7 +3,7 @@ import Header from "@/components/header/page";
 import Hero from "@/components/Hero";
 import Wallet from "@/components/wallet/Wallet";
 import WalletNav from "@/components/WalletNav";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   CHAIN_NAMESPACES,
   WALLET_ADAPTERS,
@@ -39,7 +39,12 @@ export default function Home() {
   const [user, setUser] = useState<any>(null);
   const [solanaWallet, setSolanaWallet] = useState<SolanaWallet | null>(null);
   const [loading, setLoading] = useState(false);
-  console.log("loading", loading);
+  const ref = useRef<HTMLDivElement>(null);
+  const scrollElement = () => {
+    if (ref.current) {
+      ref.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
   useEffect(() => {
     async function initializeOpenLogin() {
       const web3auth = new Web3AuthNoModal({
@@ -187,9 +192,16 @@ export default function Home() {
       <div>
         <section className="h-[100vh] flex flex-col items-center justify-center">
           <Header signIn={signIn} loading={loading} />
-          <Hero signIn={signIn} loading={loading} />
+          <Hero
+            signIn={signIn}
+            loading={loading}
+            scrollElement={scrollElement}
+          />
         </section>
-        <section className="h-[100vh] flex flex-col items-center justify-center">
+        <section
+          ref={ref}
+          className="h-[100vh] flex flex-col items-center justify-center"
+        >
           <LinkWallet />
         </section>
       </div>
