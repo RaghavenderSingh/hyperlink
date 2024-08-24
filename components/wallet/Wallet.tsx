@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { convertUsdToSol } from "@/lib/KeyStore";
 import { useSolanaTransfer } from "@/app/hooks/useSolanaTransfer";
 import { useTransferSOL } from "@/app/hooks/useTransferSOL";
@@ -28,6 +28,7 @@ export default function Wallet({
   const [step, setStep] = useState<Number>(0);
   const [amount, setAmount] = useState("0");
   const [addAmount, setAddAmount] = useState("0");
+  const [recipentPublicKey, setRecipentPublicKey] = useState<string>("");
 
   const { transferAsset } = useSolanaTransfer();
   const { publicKey } = useWallet();
@@ -96,6 +97,30 @@ export default function Wallet({
     setAddAmount("0");
     fetchTokenBalances(); // Update balances after deposit
   };
+  const handleTransferToPublickkey = async () => {
+    console.log(recipentPublicKey, amount);
+    if (!recipentPublicKey || amount === "") {
+      toast.error("Missing required information for transfer.");
+      return;
+    }
+    try {
+      setIsLoading(true);
+      const publicKey = new PublicKey(recipentPublicKey);
+      publicKey.toBytes().length === 32;
+      const amt = await convertUsdToSol(amount);
+      const transferAmount = Number(amt) * LAMPORTS_PER_SOL;
+      console.log(publicKey, amount, transferAmount);
+      await transferAsset(recipentPublicKey, transferAmount);
+      toast.success("Transfer successful");
+      setAmount("0");
+      setRecipentPublicKey("");
+      fetchTokenBalances(); // Update balances after transfer
+      setLoading(false);
+    } catch (error) {
+      toast.error("Invalid public key");
+      return false;
+    }
+  };
 
   return (
     <div>
@@ -114,11 +139,15 @@ export default function Wallet({
             balance={tokenBalances?.tokens[0]?.balance}
             handleTransfer={handleTransfer}
             setAmount={setAmount}
+            amount={amount}
             setStep={setStep}
             step={step}
             loading={loading}
             handleDeposit={handleDeposit}
             setAddAmount={setAddAmount}
+            setRecipentPublicKey={setRecipentPublicKey}
+            handleTransferToPublickkey={handleTransferToPublickkey}
+            recipentPublicKey={recipentPublicKey}
           />
         </div>
       </div>

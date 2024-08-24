@@ -76,9 +76,9 @@ export default function Header(props: IHeader) {
                     className="pl-2 py-6 text-sm md:text-base"
                   >
                     <span className="flex items-center gap-2">
-                      <div className="px-3 py-2 rounded-lg border bg-white text-black">
+                      <span className="px-3 py-2 rounded-lg border bg-white text-black">
                         <FaGoogle />
-                      </div>
+                      </span>
                       Sign up
                     </span>
                   </Button>
