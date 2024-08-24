@@ -348,7 +348,7 @@ const HyperLinkCard: React.FC = () => {
             <Input
               onChange={(e) => setRecipentPublicKey(e.target.value)}
               placeholder="Public Key"
-              className="mt-10"
+              className="mt-3"
               value={recipentPublicKey}
             />
             <Button

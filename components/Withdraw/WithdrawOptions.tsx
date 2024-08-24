@@ -54,7 +54,10 @@ export default function WithdrawOptions({ setStep }: FundingOptionsProps) {
               <ChevronRight />
             </div>
           </Button>
-          <Button className="flex  justify-between text-lg font-medium p-10 xs:w-full xs:text-base">
+          <Button
+            onClick={() => setStep(6)}
+            className="flex  justify-between text-lg font-medium p-10 xs:w-full xs:text-base"
+          >
             <div className="flex items-start  justify-start gap-[10px] ">
               <div className="flex items-center justify-center align-middle mt-3 rounded-full bg-grey-50  xs:p-3">
                 <TextCursorInput />

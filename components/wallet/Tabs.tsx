@@ -8,6 +8,7 @@ import FundingOptions from "../AddFunds/FundingOptions";
 import ExternalAccount from "../AddFunds/ExternalAccount";
 import ConnectedWallet from "../AddFunds/ConnectedWallet";
 import WithdrawOptions from "../Withdraw/WithdrawOptions";
+import TransferToAddress from "../TransferToAddress";
 
 export default function Tab({
   publicKey,
@@ -19,6 +20,11 @@ export default function Tab({
   loading,
   handleDeposit,
   setAddAmount,
+
+  setRecipentPublicKey,
+  handleTransferToPublickkey,
+  amount,
+  recipentPublicKey,
 }: {
   publicKey: string;
   setUpdateBalance: (value: boolean) => void;
@@ -26,11 +32,16 @@ export default function Tab({
   updateBalance: boolean;
   handleTransfer: () => void;
   setAmount: (value: string) => void;
+  amount: string;
   setStep: (value: number) => void;
   step: Number;
   loading: boolean;
   handleDeposit: () => void;
   setAddAmount: (value: string) => void;
+  setRecipentPublicKey: (value: string) => void;
+
+  recipentPublicKey: string;
+  handleTransferToPublickkey: () => void;
 }) {
   const { tokenBalances } = useTokens(publicKey);
   const [activeTab, setActiveTab] = useState("account");
@@ -62,6 +73,17 @@ export default function Tab({
             handleDeposit={handleDeposit}
             setStep={setStep}
             loading={loading}
+          />
+        );
+      case 6:
+        return (
+          <TransferToAddress
+            setStep={setStep}
+            setTransferAmount={setAmount}
+            setRecipentPublicKey={setRecipentPublicKey}
+            handleTransferToPublickkey={handleTransferToPublickkey}
+            transferAmount={amount}
+            recipentPublicKey={recipentPublicKey}
           />
         );
     }
