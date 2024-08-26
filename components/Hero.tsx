@@ -7,14 +7,15 @@ import Image from "next/image";
 import logo from "../public/assets/images/logo.png";
 import { CardDemo } from "./AnimatedCard";
 import BouncingDotsLoader from "./BouncingDotsLoader";
+import { useRouter } from "next/navigation";
 
 interface IHeader {
   loading: boolean;
-  scrollElement: () => void;
 }
 
 const Hero = (props: IHeader) => {
-  const { loading, scrollElement } = props;
+  const { loading } = props;
+  const router = useRouter();
   return (
     <section className="items-center  mt-18">
       <div className="container mx-auto px-4">
@@ -46,7 +47,7 @@ const Hero = (props: IHeader) => {
             )}
           </Button>
           <Button
-            onClick={scrollElement}
+            onClick={() => router.push("/create")}
             className="pl-2 py-6 text-sm md:text-base"
           >
             <span className="flex items-center gap-2">

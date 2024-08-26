@@ -16,6 +16,7 @@ type FundingOptionsProps = {
   handleDeposit: () => void;
   setAddAmount: (value: string) => void;
   loading: boolean;
+  amount: string;
 };
 
 export default function ConnectedWallet({
@@ -23,6 +24,7 @@ export default function ConnectedWallet({
   handleDeposit,
   setAddAmount,
   loading,
+  amount,
 }: FundingOptionsProps) {
   const { publicKey } = useWallet();
   const [balance, setBalance] = useState(0);
@@ -47,8 +49,6 @@ export default function ConnectedWallet({
       setBalance(info.lamports / LAMPORTS_PER_SOL);
     });
   }, [connection, publicKey]);
-
-  console.log("loading", loading);
 
   return (
     <div>
@@ -85,7 +85,7 @@ export default function ConnectedWallet({
           </div>
           <div>
             <div>
-              <CustomTextField setAmount={setAddAmount} />
+              <CustomTextField setAmount={setAddAmount} amount={amount} />
             </div>
             <div className="flex justify-between mt-4">
               <Button onClick={() => setStep(0)}>Cancel</Button>

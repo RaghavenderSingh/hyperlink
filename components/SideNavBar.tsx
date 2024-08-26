@@ -21,7 +21,7 @@ import { Separator } from "./ui/separator";
 import LoginButton from "./LoginButton";
 import { useAuth } from "@/context/AuthContext";
 
-export function SheetDemo() {
+export function SideNavBar() {
   const { state } = useAuth();
   function getFirstWords(input: string) {
     console.log("input", input);

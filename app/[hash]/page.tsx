@@ -326,6 +326,7 @@ const HyperLinkCard: React.FC = () => {
             <SendHyperlink
               setStep={setStep}
               setTransferAmount={setTransferAmount}
+              amount={transferAmount}
             />
             <Button
               className="mt-1 w-full"
@@ -343,6 +344,7 @@ const HyperLinkCard: React.FC = () => {
             <SendHyperlink
               setStep={setStep}
               setTransferAmount={setTransferAmount}
+              amount={transferAmount}
             />
             <Input
               onChange={(e) => setRecipentPublicKey(e.target.value)}
