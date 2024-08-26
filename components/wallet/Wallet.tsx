@@ -3,13 +3,14 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
-import { convertUsdToSol } from "@/lib/KeyStore";
+import { convertUsdToSol, getPrivateKey } from "@/lib/KeyStore";
 import { useSolanaTransfer } from "@/app/hooks/useSolanaTransfer";
 import { useTransferSOL } from "@/app/hooks/useTransferSOL";
 
 import Assets from "../Assets";
 import Tab from "./Tabs";
 import { Skeleton } from "../ui/skeleton";
+import { get } from "http";
 
 export default function Wallet({
   name,
@@ -21,7 +22,6 @@ export default function Wallet({
   hyperPublicKey: string;
 }) {
   if (!name || !profileImage || !hyperPublicKey) return <>...Loading</>;
-
   const [tokenBalances, setTokenBalances] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -30,12 +30,9 @@ export default function Wallet({
   const [addAmount, setAddAmount] = useState("0");
   const [recipentPublicKey, setRecipentPublicKey] = useState<string>("");
 
-  const { transferAsset } = useSolanaTransfer();
+  const { transferAsset, transferStatus } = useSolanaTransfer();
   const { publicKey } = useWallet();
-  const [recipientAddress, setRecipientAddress] = useState(
-    publicKey?.toBase58()
-  );
-  const { transferSOL, isTransferring, error } = useTransferSOL();
+  const { transferSOL } = useTransferSOL();
 
   const fetchTokenBalances = useCallback(async () => {
     setIsLoading(true);
@@ -53,25 +50,23 @@ export default function Wallet({
 
   useEffect(() => {
     fetchTokenBalances();
-
-    // Set up an interval to fetch balances every 30 seconds
+    // Set up an interval to fetch balances every 30 seconds ...
     const intervalId = setInterval(fetchTokenBalances, 30000);
-
-    // Clean up the interval when the component unmounts
     return () => clearInterval(intervalId);
   }, [fetchTokenBalances]);
 
   const handleTransfer = async () => {
-    if (!recipientAddress || !amount) {
+    if (!publicKey?.toBase58() || !amount) {
       toast.error("Something went wrong. Please try again later");
       return;
     }
     setLoading(true);
-    const amt = Number(await convertUsdToSol(amount));
-    await transferAsset(recipientAddress, amt * LAMPORTS_PER_SOL);
-    toast.success("Transfer successful");
+    const amt = Number(parseInt(await convertUsdToSol(amount)));
+    await transferAsset(publicKey?.toBase58(), amt * LAMPORTS_PER_SOL);
+    console.log("status", transferStatus);
+    toast.success(transferStatus);
     setAmount("0");
-    fetchTokenBalances(); // Update balances after transfer
+    fetchTokenBalances();
     setLoading(false);
     setStep(0);
   };
@@ -87,7 +82,6 @@ export default function Wallet({
     }
 
     const amt = Number(await convertUsdToSol(addAmount));
-    console.log("amt", amt);
     setLoading(true);
     await transferSOL(hyperPublicKey, amt * LAMPORTS_PER_SOL);
 
@@ -95,10 +89,9 @@ export default function Wallet({
     setLoading(false);
     toast.success(`Transfer successful $${amt} added`);
     setAddAmount("0");
-    fetchTokenBalances(); // Update balances after deposit
+    fetchTokenBalances();
   };
   const handleTransferToPublickkey = async () => {
-    console.log(recipentPublicKey, amount);
     if (!recipentPublicKey || amount === "") {
       toast.error("Missing required information for transfer.");
       return;
@@ -109,12 +102,11 @@ export default function Wallet({
       publicKey.toBytes().length === 32;
       const amt = await convertUsdToSol(amount);
       const transferAmount = Number(amt) * LAMPORTS_PER_SOL;
-      console.log(publicKey, amount, transferAmount);
       await transferAsset(recipentPublicKey, transferAmount);
       toast.success("Transfer successful");
       setAmount("0");
       setRecipentPublicKey("");
-      fetchTokenBalances(); // Update balances after transfer
+      fetchTokenBalances();
       setLoading(false);
     } catch (error) {
       toast.error("Invalid public key");

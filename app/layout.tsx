@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { SolanaWalletProvider } from "@/context/SolanaWalletContext";
 import { WagmiWrapper } from "@/utils/wagmi/WagmiContext";
 import AppWalletProvider from "@/components/AppWalletProvider";
 import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from "@/context/AuthContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,8 +23,10 @@ export default function RootLayout({
       <body className={inter.className}>
         <WagmiWrapper>
           <AppWalletProvider>
-            {children}
-            <Toaster />
+            <AuthProvider>
+              {children}
+              <Toaster />
+            </AuthProvider>
           </AppWalletProvider>
         </WagmiWrapper>
       </body>

@@ -9,6 +9,7 @@ import ExternalAccount from "../AddFunds/ExternalAccount";
 import ConnectedWallet from "../AddFunds/ConnectedWallet";
 import WithdrawOptions from "../Withdraw/WithdrawOptions";
 import TransferToAddress from "../TransferToAddress";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Tab({
   publicKey,
@@ -43,7 +44,8 @@ export default function Tab({
   recipentPublicKey: string;
   handleTransferToPublickkey: () => void;
 }) {
-  const { tokenBalances } = useTokens(publicKey);
+  const { state } = useAuth();
+  const { tokenBalances } = useTokens(state.publicKey);
   const [activeTab, setActiveTab] = useState("account");
 
   const handleSteps = (step: Number) => {
@@ -127,7 +129,7 @@ export default function Tab({
         <TabsContent value="addFunds">{handleSteps(step)}</TabsContent>
         <TabsContent value="withdraw">{handleSteps(step)}</TabsContent>
         <TabsContent value="swap">
-          <Swap tokenBalances={tokenBalances} publicKey={publicKey} />
+          <Swap tokenBalances={tokenBalances} />
         </TabsContent>
       </div>
     </Tabs>

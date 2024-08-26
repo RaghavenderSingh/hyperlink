@@ -1,33 +1,20 @@
+"use client";
+import { useAuth } from "@/context/AuthContext";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 
-
-let privateKey: string | null = null;
-let publicKey: string | null = null;
-
-export const setPublicKey = (key: string) => {
-    publicKey = key;
-};
-export const setPrivateKey = (key: string) => {
-    privateKey = key;
-};
-
 export const getPrivateKey = () => {
+    const state = useAuth();
+    console.log("state", state);
+    if (state.state.privateKey) {
 
-    if (privateKey === null) {
-        throw new Error("Private key is not set");
-    }
-    else {
-        return privateKey;
+        return state.state.privateKey as string;
     }
 
 };
 export const getPublicKey = () => {
-
-    if (publicKey === null) {
-        return ("Public key is not set");
-    }
-    else {
-        return publicKey;
+    const state = useAuth();
+    if (state.state.publicKey) {
+        return state.state.publicKey as string;
     }
 
 };

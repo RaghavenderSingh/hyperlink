@@ -4,15 +4,15 @@ import {
   PublicKey,
   Transaction,
   SystemProgram,
-  LAMPORTS_PER_SOL,
   Keypair,
 } from "@solana/web3.js";
 import { getPrivateKey, getPublicKey } from "@/lib/KeyStore";
+import { useAuth } from "@/context/AuthContext";
 
 export const useSolanaTransfer = () => {
   const [transferStatus, setTransferStatus] = useState<string>("");
   const [isTransferring, setIsTransferring] = useState<boolean>(false);
-
+  const state = useAuth();
   const transferAsset = async (recipientAddress: string, amount: number) => {
     setIsTransferring(true);
     setTransferStatus("Initiating transfer...");
@@ -20,8 +20,8 @@ export const useSolanaTransfer = () => {
     try {
       const connection = new Connection("https://api.devnet.solana.com");
 
-      const privateKey = getPrivateKey();
-      const publicKey = getPublicKey();
+      const privateKey = state.state.privateKey as string;
+      const publicKey = state.state.publicKey as string;
 
       const senderKeypair = Keypair.fromSecretKey(
         new Uint8Array(Buffer.from(privateKey, "hex"))
