@@ -1,13 +1,11 @@
+"use client";
 import { Button } from "@/components/ui/button";
 
 import {
   Sheet,
   SheetClose,
   SheetContent,
-  SheetDescription,
   SheetFooter,
-  SheetHeader,
-  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import {
@@ -15,39 +13,25 @@ import {
   Receipt,
   ScanText,
   Sparkles,
-  Star,
-  Stars,
   Wallet,
 } from "lucide-react";
 
-import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Separator } from "./ui/separator";
+import LoginButton from "./LoginButton";
+import { useAuth } from "@/context/AuthContext";
 
-export function SheetDemo({
-  profileImage,
-  signOut,
-  name,
-  email,
-}: {
-  profileImage: string;
-  signOut: () => Promise<void>;
-  name: string;
-  email: string;
-}) {
-  console.log("info", name, email);
+export function SheetDemo() {
+  const { state } = useAuth();
   function getFirstWords(input: string) {
-    const words = input.split(" "); // Split the input into an array of words
-
-    // Function to capitalize the first letter of a word
+    console.log("input", input);
+    const words = input?.split(" ");
     const capitalize = (word: string) =>
       word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-
-    // Check if the input starts with "Raghavender Singh"
-    if (words.length >= 2) {
-      return `${capitalize(words[0])} ${capitalize(words[1])}`; // Return "Raghavender Singh"
+    if (words?.length >= 2) {
+      return `${capitalize(words[0])} ${capitalize(words[1])}`;
     } else {
-      return capitalize(words[0]); // Return the first word capitalized
+      return capitalize(words[0]);
     }
   }
   return (
@@ -57,7 +41,7 @@ export function SheetDemo({
           <img
             className="rounded-full"
             alt=""
-            src={profileImage}
+            src={state.user?.profileImage}
             width={30}
             height={30}
           />
@@ -66,14 +50,6 @@ export function SheetDemo({
       </SheetTrigger>
 
       <SheetContent>
-        {/* <SheetHeader>
-          <div className="flex w-full items-center justify-start  text-left">
-            <div>
-              <Image src={logo} alt="logo" width={50} height={50} />
-            </div>
-            <div className="font-bold text-[22px] ">HyperLink</div>
-          </div>
-        </SheetHeader> */}
         <div className="grid gap-4 py-4">
           <div className="grid  items-center gap-4">
             <div className="flex w-full items-center justify-start gap-3">
@@ -82,7 +58,7 @@ export function SheetDemo({
                   <AvatarImage
                     height={"60px"}
                     width={"60px"}
-                    src={profileImage}
+                    src={state.user?.profileImage}
                     alt=""
                   />
                   <AvatarFallback>CN</AvatarFallback>
@@ -90,9 +66,11 @@ export function SheetDemo({
               </div>
               <div>
                 <div className=" text-left font-bold text-gray-600">
-                  {getFirstWords(name)}
+                  {state.user?.name ?? getFirstWords(state.user?.name)}
                 </div>
-                <div className="break-all text-left text-gray-600">{email}</div>
+                <div className="break-all text-left text-gray-600">
+                  {state.user?.email}
+                </div>
               </div>
             </div>
             <div className="flex w-full items-center justify-start gap-1 text-left mt-4">
@@ -143,9 +121,7 @@ export function SheetDemo({
         </div>
         <SheetFooter>
           <SheetClose asChild>
-            <Button onClick={signOut} type="submit">
-              Logout
-            </Button>
+            <LoginButton />
           </SheetClose>
         </SheetFooter>
       </SheetContent>

@@ -8,6 +8,7 @@ import { Wallet } from "lucide-react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import logo from "../../public/assets/images/logo.png";
 import Image from "next/image";
+import LoginButton from "../LoginButton";
 
 interface IHeader {
   signIn: () => Promise<void>;
@@ -71,17 +72,7 @@ export default function Header(props: IHeader) {
                   </WalletMultiButton>
                 </div>
                 <div>
-                  <Button
-                    onClick={signIn}
-                    className="pl-2 py-6 text-sm md:text-base"
-                  >
-                    <span className="flex items-center gap-2">
-                      <span className="px-3 py-2 rounded-lg border bg-white text-black">
-                        <FaGoogle />
-                      </span>
-                      Sign up
-                    </span>
-                  </Button>
+                  <LoginButton />
                 </div>
               </div>
             </div>

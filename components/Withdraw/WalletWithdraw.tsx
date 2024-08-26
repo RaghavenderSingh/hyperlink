@@ -1,16 +1,8 @@
-"use client";
 import { ArrowLeft } from "lucide-react";
-import React, { useState } from "react";
 import { Combobox } from "../Select";
 import { Button } from "../ui/button";
 import WithdrawlInput from "./WithdrawlInput";
-import { set } from "@project-serum/anchor/dist/cjs/utils/features";
-import { useSolanaTransfer } from "@/app/hooks/useSolanaTransfer";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { toast } from "sonner";
 import BouncingDotsLoader from "../BouncingDotsLoader";
-import { useTokens } from "@/app/hooks/useTokens";
-import { steps } from "framer-motion";
 type FundingOptionsProps = {
   setStep: (value: number) => void;
   balance: number;

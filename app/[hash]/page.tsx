@@ -387,7 +387,7 @@ const HyperLinkCard: React.FC = () => {
     return urlString.substring(0, length) + "...";
   };
   return (
-    <div className="flex flex-col  m-1">
+    <div className="flex flex-col  m-10">
       <div className="fixed top-4 right-4 flex items-end justify-end z-10">
         <WalletMultiButton style={{ backgroundColor: "black", height: "40px" }}>
           {!connected && <Wallet />}

@@ -6,6 +6,7 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Image from "next/image";
 import logo from "../public/assets/images/logo.png";
+import { useAuth } from "@/context/AuthContext";
 
 export default function WalletNav({
   profileImage,
@@ -19,6 +20,7 @@ export default function WalletNav({
   signOut: () => Promise<void>;
 }) {
   const { connected } = useWallet();
+  const { state } = useAuth();
   return (
     <div className="flex justify-between gap-4 p-4 rounded-lg ">
       <Image src={logo} alt="logo" width={75} height={60} />
@@ -32,12 +34,7 @@ export default function WalletNav({
             {!connected && <Wallet />}
           </WalletMultiButton>
 
-          <SheetDemo
-            profileImage={profileImage}
-            signOut={signOut}
-            email={mail}
-            name={name}
-          />
+          <SheetDemo />
         </div>
       </div>
     </div>

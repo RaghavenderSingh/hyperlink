@@ -1,62 +1,48 @@
-// context/GlobalContext.tsx
-import { createContext, useState, useEffect, FC, ReactNode } from "react";
-import {
-  CHAIN_NAMESPACES,
-  WALLET_ADAPTERS,
-  SafeEventEmitterProvider,
-} from "@web3auth/base";
-import {
-  SolanaWallet,
-  SolanaPrivateKeyProvider,
-} from "@web3auth/solana-provider";
-import { Web3AuthNoModal } from "@web3auth/no-modal";
-import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
+"use client";
 import {
   oauthClientId,
   productName,
   web3AuthClientId,
   web3AuthLoginType,
   web3AuthVerifier,
-} from "../constants";
-import { setPrivateKey, setPublicKey } from "@/lib/KeyStore";
-import { useWagmi } from "../utils/wagmi/WagmiContext";
+} from "@/constants";
+import {
+  CHAIN_NAMESPACES,
+  SafeEventEmitterProvider,
+  WALLET_ADAPTERS,
+} from "@web3auth/base";
+import { Web3AuthNoModal } from "@web3auth/no-modal";
+import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
+import {
+  SolanaPrivateKeyProvider,
+  SolanaWallet,
+} from "@web3auth/solana-provider";
+import React, { useEffect, useState } from "react";
+import Header from "./header/page";
+import WalletNav from "./WalletNav";
+import { disconnect } from "wagmi/actions";
 import { useAccount } from "wagmi";
+import { useAuth } from "@/context/AuthContext";
 
-interface GlobalContextType {
-  walletAddress: string;
-  user: any;
-  signIn: () => Promise<void>;
-  signOut: () => Promise<void>;
-  setWalletAddress: (address: string) => void;
-  setUser: (user: any) => void;
-}
-
-export const GlobalContext = createContext<GlobalContextType | null>(null);
-
-interface GlobalProviderProps {
-  children: ReactNode;
-}
-
-export const GlobalProvider: FC<GlobalProviderProps> = ({ children }) => {
-  const [walletAddress, setWalletAddress] = useState<string>("");
-  const [connecting, setConnecting] = useState(false);
-  const { disconnect } = useWagmi();
-  const { address, isConnecting, isConnected } = useAccount();
+export default function Nav() {
   const [web3auth, setWeb3auth] = useState<Web3AuthNoModal | null>(null);
   const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(
     null
   );
-  const [user, setUser] = useState<any>(null);
+  const { address, isConnecting, isConnected } = useAccount();
   const [solanaWallet, setSolanaWallet] = useState<SolanaWallet | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [walletAddress, setWalletAddress] = useState<string>("");
+  const { state, dispatch } = useAuth();
 
   useEffect(() => {
     async function initializeOpenLogin() {
       const web3auth = new Web3AuthNoModal({
-        clientId: web3AuthClientId, // get it from Web3Auth Dashboard
+        clientId: web3AuthClientId,
         web3AuthNetwork: "sapphire_devnet",
         chainConfig: {
           chainNamespace: CHAIN_NAMESPACES.SOLANA,
-          chainId: "0x3", // Please use 0x1 for Mainnet, 0x2 for Testnet, 0x3 for Devnet
+          chainId: "0x3",
           rpcTarget: "https://api.devnet.solana.com",
           displayName: "Solana Devnet",
           blockExplorerUrl: "https://explorer.solana.com",
@@ -67,7 +53,7 @@ export const GlobalProvider: FC<GlobalProviderProps> = ({ children }) => {
 
       const chainConfig = {
         chainNamespace: CHAIN_NAMESPACES.SOLANA,
-        chainId: "0x3", // Please use 0x1 for Mainnet, 0x2 for Testnet, 0x3 for Devnet
+        chainId: "0x3",
         rpcTarget: "https://api.devnet.solana.com",
         displayName: "Solana Devnet",
         blockExplorer: "https://explorer.solana.com",
@@ -103,45 +89,65 @@ export const GlobalProvider: FC<GlobalProviderProps> = ({ children }) => {
 
       setProvider(web3auth.provider);
       //@ts-ignore
-      const solanaWallet = new SolanaWallet(web3auth.provider); // web3auth.provider
+      const solanaWallet = new SolanaWallet(web3auth.provider);
 
       setSolanaWallet(solanaWallet);
+
+      if (web3auth.connected) {
+        const user = await web3auth.getUserInfo();
+
+        const accounts = await solanaWallet.requestAccounts();
+        setWalletAddress(accounts[0]);
+      }
     }
 
     initializeOpenLogin();
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
-    if (web3auth && web3auth.connected) {
+    if (web3auth && web3auth.connected && !state.isAuthenticated) {
       getAccounts().then((res: any) => {
         setWalletAddress(res);
-        setPublicKey(res);
         getUser(web3auth);
       });
     }
-  }, [provider]);
+  }, [provider, state.isAuthenticated, web3auth]);
 
-  const signIn = async () => {
+  async function getUser(web3auth: any) {
     if (!web3auth) {
       return;
     }
-    if (web3auth.connected) {
+    const user = await web3auth?.getUserInfo();
+    dispatch({ type: "LOGIN", payload: user });
+  }
+
+  const signIn = async () => {
+    setLoading(true);
+    if (!web3auth) {
+      setLoading(false);
       return;
     }
-    const web3authProvider = await web3auth.connectTo(
-      WALLET_ADAPTERS.OPENLOGIN,
-      {
-        loginProvider: "google",
-      }
-    );
-    setProvider(web3authProvider);
-    const acc = (await getAccounts()) as any;
-    localStorage.setItem("isConnected", "true");
-    localStorage.setItem("isGoogleLogin", "true");
-    const user = await web3auth?.getUserInfo();
-    setUser(user);
-    setWalletAddress(acc);
-    setPublicKey(acc);
+    if (web3auth.connected) {
+      setLoading(false);
+      return;
+    }
+    try {
+      const web3authProvider = await web3auth.connectTo(
+        WALLET_ADAPTERS.OPENLOGIN,
+        {
+          loginProvider: "google",
+        }
+      );
+      setProvider(web3authProvider);
+      const acc = (await getAccounts()) as any;
+      localStorage.setItem("isConnected", "true");
+      localStorage.setItem("isGoogleLogin", "true");
+      const user = await web3auth?.getUserInfo();
+      setWalletAddress(acc);
+    } catch (error) {
+      console.error("Login failed", error);
+    }
+    setLoading(false);
   };
 
   const getAccounts = async () => {
@@ -154,7 +160,6 @@ export const GlobalProvider: FC<GlobalProviderProps> = ({ children }) => {
       const priv = (await provider.request({
         method: "private_key",
       })) as string;
-      setPrivateKey(priv);
 
       return await accounts[0];
     } catch (error) {
@@ -163,7 +168,6 @@ export const GlobalProvider: FC<GlobalProviderProps> = ({ children }) => {
   };
 
   const signOut = async () => {
-    console.log("signOut");
     await web3auth?.logout();
     localStorage.removeItem("isGoogleLogin");
     localStorage.removeItem("isConnected");
@@ -171,38 +175,23 @@ export const GlobalProvider: FC<GlobalProviderProps> = ({ children }) => {
       await disconnect();
     }
     setWalletAddress("");
-    setUser(null);
+    dispatch({ type: "LOGOUT" });
   };
 
-  useEffect(() => {
-    if (address && !isConnecting && connecting) {
-      localStorage.setItem("isConnected", "true");
-      localStorage.setItem("isGoogleLogin", "false");
-      setConnecting(false);
-      setWalletAddress(address);
-      setPublicKey(address);
-    }
-  }, [isConnecting]);
-  async function getUser(web3auth: any) {
-    if (!web3auth) {
-      return;
-    }
-    const user = await web3auth?.getUserInfo();
-    setUser(user);
+  console.log(state.user);
+  if (state.isAuthenticated) {
+    return (
+      <WalletNav
+        profileImage={state.user?.profileImage}
+        name={state.user?.name}
+        mail={state.user?.email}
+        signOut={signOut}
+      />
+    );
   }
-
   return (
-    <GlobalContext.Provider
-      value={{
-        walletAddress,
-        user,
-        signIn,
-        signOut,
-        setWalletAddress,
-        setUser,
-      }}
-    >
-      {children}
-    </GlobalContext.Provider>
+    <div>
+      <Header signIn={signIn} loading={loading} />
+    </div>
   );
-};
+}

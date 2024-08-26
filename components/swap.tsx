@@ -1,18 +1,14 @@
 "use client";
-import { ReactNode, use, useEffect, useState } from "react";
-import { SUPPORTED_TOKENS, TokenDetails } from "../lib/tokens";
+import { ReactNode, useEffect, useState } from "react";
 
 import axios from "axios";
-import { TokenWithbalance } from "@/app/hooks/useTokens";
 import { Button } from "./ui/button";
 import { TokenApiList, useFetchTokens } from "@/app/hooks/useFetchTokens";
 import { TokenListDialog } from "./TokenListDialog";
 
 export function Swap({
-  publicKey,
   tokenBalances,
 }: {
-  publicKey: string;
   tokenBalances: {
     totalBalance: number;
     tokens: TokenWithbalance[];
@@ -31,18 +27,21 @@ export function Swap({
 
   useEffect(() => {
     setBaseAsset(tokens?.[0]);
-    setQuoteAsset(tokens?.[1])
-  }, [tokens])
+    setQuoteAsset(tokens?.[1]);
+  }, [tokens]);
   useEffect(() => {
     if (!baseAmount) {
       return;
     }
     setFetchingQuote(true);
-    quoteAsset?.address && baseAsset?.address &&
+    quoteAsset?.address &&
+      baseAsset?.address &&
       axios
         .get(
-          `https://quote-api.jup.ag/v6/quote?inputMint=${baseAsset?.address
-          }&outputMint=${quoteAsset?.address}&amount=${Number(baseAmount) * 10 ** baseAsset?.decimals
+          `https://quote-api.jup.ag/v6/quote?inputMint=${
+            baseAsset?.address
+          }&outputMint=${quoteAsset?.address}&amount=${
+            Number(baseAmount) * 10 ** baseAsset?.decimals
           }&slippageBps=50`
         )
         .then((res) => {
@@ -61,7 +60,7 @@ export function Swap({
     setBaseAsset(quoteAsset);
     setQuoteAsset(temp);
   };
-
+  console.log("tokenBalanceswewe", baseAmount);
   return (
     <div className="pl-4 pt-12 pb-12 bg-slate-50">
       <div className="text-2xl font-bold pb-4">Swap Tokens</div>
@@ -94,7 +93,9 @@ export function Swap({
 
       <div className="flex justify-center">
         <div
-          onClick={() => { swapAssets() }}
+          onClick={() => {
+            swapAssets();
+          }}
           className="cursor-pointer rounded-full w-10 h-10 border absolute mt-[-20px] bg-white flex justify-center pt-2"
         >
           <SwapIcon />
@@ -167,7 +168,7 @@ function SwapInputRow({
   inputLoading?: boolean;
   tokenList?: TokenApiList[];
 }) {
-  const [insufficientFunds, setInsufficientFunds] = useState<boolean>(false)
+  const [insufficientFunds, setInsufficientFunds] = useState<boolean>(false);
 
   return (
     <div
@@ -187,46 +188,56 @@ function SwapInputRow({
             <input
               disabled={inputDisabled}
               onChange={(e) => {
-                onAmountChange?.(e.target.value)
-                const balance = parseFloat(tokenBalances?.tokens.find((x) => x.name === selectedToken?.name)?.balance ?? "0");
-                const validAmount = e.target.value !== undefined ? parseFloat(e.target.value) : NaN;
+                onAmountChange?.(e.target.value);
+                const balance = parseFloat(
+                  tokenBalances?.tokens.find(
+                    (x) => x.name === selectedToken?.name
+                  )?.balance ?? "0"
+                );
+                const validAmount =
+                  e.target.value !== undefined
+                    ? parseFloat(e.target.value)
+                    : NaN;
                 const insufficientFunds = balance < validAmount;
                 setInsufficientFunds(insufficientFunds);
               }}
               placeholder="0"
               type="number"
               className={`bg-slate-50 text-right p-6 outline-none text-4xl pr-2 
-              ${inputLoading ? 'text-transparent' : ''} 
-              ${insufficientFunds ? 'text-red-500' : 'text-black'}`}
+              ${inputLoading ? "text-transparent" : ""} 
+              ${insufficientFunds ? "text-red-500" : "text-black"}`}
               dir="ltr"
               value={amount}
             />
-            {insufficientFunds && <div className="flex justify-end mr-2">
-              <div className="flex text-xs mb-1 mt-1 px-2 py-1 font-bold bg-[#fdeaeb] text-[#de3030] rounded-lg">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="w-3 h-3 text-red-500 mr-1"
-                >
-                  <path d="M12 2L2 22h20L12 2z" />
-                  <line x1="12" y1="8" x2="12" y2="13" />
-                  <circle cx="12" cy="16" r="1" />
-                </svg> Insufficient Funds
+            {insufficientFunds && (
+              <div className="flex justify-end mr-2">
+                <div className="flex text-xs mb-1 mt-1 px-2 py-1 font-bold bg-[#fdeaeb] text-[#de3030] rounded-lg">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-3 h-3 text-red-500 mr-1"
+                  >
+                    <path d="M12 2L2 22h20L12 2z" />
+                    <line x1="12" y1="8" x2="12" y2="13" />
+                    <circle cx="12" cy="16" r="1" />
+                  </svg>{" "}
+                  Insufficient Funds
+                </div>
               </div>
-            </div>}
+            )}
 
             {inputLoading && (
               <div className="absolute inset-y-0 right-0 flex items-center pr-12">
-                <div className='flex space-x-1 justify-center items-center dark:invert'>
-                  <span className='sr-only'>Loading...</span>
-                  <div className='h-1.5 w-1.5 bg-black rounded-full animate-bounce [animation-delay:-0.3s]'></div>
-                  <div className='h-1.5 w-1.5 bg-black rounded-full animate-bounce [animation-delay:-0.15s]'></div>
-                  <div className='h-1.5 w-1.5 bg-black rounded-full animate-bounce'></div>
+                <div className="flex space-x-1 justify-center items-center dark:invert">
+                  <span className="sr-only">Loading...</span>
+                  <div className="h-1.5 w-1.5 bg-black rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                  <div className="h-1.5 w-1.5 bg-black rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                  <div className="h-1.5 w-1.5 bg-black rounded-full animate-bounce"></div>
                 </div>
               </div>
             )}
