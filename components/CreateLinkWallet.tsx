@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import LinkPopup from "./LinkPopup";
 import { convertUsdToSol } from "@/lib/KeyStore";
 import BouncingDotsLoader from "./BouncingDotsLoader";
+import { toast } from "sonner";
 
 export default function CreateLinkWallet() {
   const [amount, setAmount] = useState<string>("0");
@@ -26,9 +27,11 @@ export default function CreateLinkWallet() {
   const [linkPopupOpen, setLinkPopupOpen] = useState(false);
   const [signature, setSignature] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<any>(null);
   const handleSelection = (selectedOption: any) => {
     console.log("Selected option:", selectedOption);
     // Handle the selected option here
+    setSelectedOption(selectedOption);
   };
 
   const createLinkAndTransfer = async () => {
@@ -40,27 +43,36 @@ export default function CreateLinkWallet() {
     try {
       // Create HyperLink
       setIsLoading(true);
+
       const hyperlink = await HyperLink.create();
       const hyperlinkUrl = hyperlink.url.toString();
+      if (selectedOption === "Connect Wallet") {
+        const connection = new Connection(
+          "https://api.devnet.solana.com",
+          "confirmed"
+        );
+        const amt = await convertUsdToSol(amount);
+        const lamports = BigInt(Math.round(Number(amt) * LAMPORTS_PER_SOL));
+        console.log("amt", amt, lamports);
+        const transaction = new Transaction().add(
+          SystemProgram.transfer({
+            fromPubkey: publicKey,
+            toPubkey: new PublicKey(hyperlink.keypair.publicKey),
+            lamports: BigInt(Number(amt) * LAMPORTS_PER_SOL),
+          })
+        );
 
+        const signature = await sendTransaction(transaction, connection);
+        await connection.confirmTransaction(signature, "confirmed");
+      } else if (selectedOption === "Login to Hyperlink") {
+        {
+          console.log("Open in wallet ahahahahah");
+          setIsLoading(false);
+          return;
+        }
+      }
       // Transfer funds
-      const connection = new Connection(
-        "https://api.devnet.solana.com",
-        "confirmed"
-      );
-      const amt = await convertUsdToSol(amount);
-      const lamports = BigInt(Math.round(Number(amt) * LAMPORTS_PER_SOL));
-      console.log("amt", amt, lamports);
-      const transaction = new Transaction().add(
-        SystemProgram.transfer({
-          fromPubkey: publicKey,
-          toPubkey: new PublicKey(hyperlink.keypair.publicKey),
-          lamports: BigInt(Number(amt) * LAMPORTS_PER_SOL),
-        })
-      );
 
-      const signature = await sendTransaction(transaction, connection);
-      await connection.confirmTransaction(signature, "confirmed");
       window.open(hyperlinkUrl, "_blank");
       setLinkPopupOpen(true);
       setGeneratedLink(hyperlinkUrl);
@@ -68,11 +80,13 @@ export default function CreateLinkWallet() {
       setGeneratedLink(hyperlinkUrl);
       setIsLoading(false);
       console.log("Transfer successful. Signature:", signature);
+      toast.success("Transfer successful. Signature: " + signature);
       setError("");
       setAmount("0");
     } catch (err) {
       setIsLoading(false);
       console.error("Error:", err);
+      toast.error("Error creating HyperLink or transferring funds.");
       setError("Error creating HyperLink or transferring funds.");
     }
   };
