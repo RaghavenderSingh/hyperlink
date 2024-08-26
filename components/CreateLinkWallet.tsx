@@ -19,7 +19,7 @@ import { convertUsdToSol } from "@/lib/KeyStore";
 import BouncingDotsLoader from "./BouncingDotsLoader";
 
 export default function CreateLinkWallet() {
-  const [amount, setAmount] = useState("0");
+  const [amount, setAmount] = useState<string>("0");
   const [generatedLink, setGeneratedLink] = useState("");
   const [error, setError] = useState("");
   const { connected, publicKey, sendTransaction } = useWallet();
@@ -103,7 +103,7 @@ export default function CreateLinkWallet() {
           </span>
         </div>
 
-        <CustomTextField setAmount={setAmount} />
+        <CustomTextField setAmount={setAmount} amount={amount} />
 
         <Button
           disabled={!connected || isLoading}

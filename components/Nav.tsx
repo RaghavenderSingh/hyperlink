@@ -8,10 +8,16 @@ import logo from "../public/assets/images/logo.png";
 import Image from "next/image";
 import LoginButton from "./LoginButton";
 import { SideNavBar } from "./SideNavBar";
+import { useEffect, useState } from "react";
 
 export default function Nav() {
   const { state } = useAuth();
   const { connected } = useWallet();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   if (state.isAuthenticated) {
     return (
       <div className="flex justify-between gap-4 p-4 rounded-lg ">
@@ -20,11 +26,13 @@ export default function Nav() {
         <div></div>
         <div>
           <div className="flex justify-between gap-2">
-            <WalletMultiButton
-              style={{ backgroundColor: "black", height: "40px" }}
-            >
-              {!connected && <Wallet />}
-            </WalletMultiButton>
+            {mounted && (
+              <WalletMultiButton
+                style={{ backgroundColor: "black", height: "40px" }}
+              >
+                {!connected && <Wallet />}
+              </WalletMultiButton>
+            )}
 
             <SideNavBar />
           </div>
@@ -80,11 +88,13 @@ export default function Nav() {
                 </div>
                 <div className="flex gap-4 items-center pr-2">
                   <div>
-                    <WalletMultiButton
-                      style={{ backgroundColor: "black", height: "40px" }}
-                    >
-                      {!connected && <Wallet />}
-                    </WalletMultiButton>
+                    {mounted && (
+                      <WalletMultiButton
+                        style={{ backgroundColor: "black", height: "40px" }}
+                      >
+                        {!connected && <Wallet />}
+                      </WalletMultiButton>
+                    )}
                   </div>
                   <div>
                     <LoginButton />

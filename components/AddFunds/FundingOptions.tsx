@@ -9,12 +9,14 @@ import {
 } from "lucide-react";
 import WalletModal from "../WalletModal";
 import { getPublicKey } from "@/lib/KeyStore";
+import { useAuth } from "@/context/AuthContext";
 
 type FundingOptionsProps = {
   setStep: (value: number) => void;
 };
 export default function FundingOptions({ setStep }: FundingOptionsProps) {
   const [showModal, setShowModal] = useState(false);
+  const { state } = useAuth();
   return (
     <div>
       <div className=" flex-col px-25 py-10">
@@ -88,7 +90,7 @@ export default function FundingOptions({ setStep }: FundingOptionsProps) {
         <WalletModal
           isVisible={showModal}
           onClose={() => setShowModal(false)}
-          publicKey={getPublicKey()}
+          publicKey={state.publicKey}
         />
       )}
     </div>

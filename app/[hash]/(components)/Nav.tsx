@@ -25,9 +25,6 @@ export default function Nav() {
                 {!connected && <Wallet />}
               </WalletMultiButton>
             </div>
-            <div>
-              <LoginButton />
-            </div>
           </div>
         </div>
       </div>

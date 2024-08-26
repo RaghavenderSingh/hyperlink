@@ -1,16 +1,15 @@
 import React, { useState, useEffect, useRef, ChangeEvent } from "react";
-import axios from "axios";
-import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { convertUsdToSol } from "@/lib/KeyStore";
 
 type QuickAmount = 1 | 2 | 5;
 type setAmountProps = {
   setAmount: (value: string) => void;
+  amount: string;
 };
 
-const CustomTextField = ({ setAmount }: setAmountProps) => {
-  const [value, setValue] = useState<string>("");
-  const [solValue, setSolValue] = useState<string>("0");
+const CustomTextField = ({ setAmount, amount }: setAmountProps) => {
+  const [value, setValue] = useState("");
+  const [solValue, setSolValue] = useState<string>(amount ? amount : "0");
   const [cursorPosition, setCursorPosition] = useState<number>(0);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isFlipped, setIsFlipped] = useState<boolean>(false);

@@ -75,6 +75,7 @@ export default function Tab({
             handleDeposit={handleDeposit}
             setStep={setStep}
             loading={loading}
+            amount={amount}
           />
         );
       case 6:

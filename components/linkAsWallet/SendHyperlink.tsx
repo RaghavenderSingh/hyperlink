@@ -1,12 +1,16 @@
 import React from "react";
-import { Button } from "../ui/button";
-import { ArrowLeft, ChevronRight, KeyRound, Link2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import CustomTextField from "../CustomTextField";
 type FundingOptionsProps = {
   setStep: (value: number) => void;
   setTransferAmount: (value: string) => void;
+  amount: string;
 };
-export default function ({ setStep, setTransferAmount }: FundingOptionsProps) {
+export default function ({
+  setStep,
+  setTransferAmount,
+  amount,
+}: FundingOptionsProps) {
   return (
     <div className="flex w-full flex-col justify-start space-y-5 xs:space-y-0 xs:flex-row xs:space-x-10">
       <div
@@ -19,7 +23,7 @@ export default function ({ setStep, setTransferAmount }: FundingOptionsProps) {
         <span>Back</span>
       </div>
       <div className="flex w-full flex-col justify-start space-y-5 xs:space-y-0 xs:flex-row xs:space-x-10">
-        <CustomTextField setAmount={setTransferAmount} />
+        <CustomTextField setAmount={setTransferAmount} amount={amount} />
       </div>
     </div>
   );
