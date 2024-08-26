@@ -1,197 +1,100 @@
 "use client";
-import {
-  oauthClientId,
-  productName,
-  web3AuthClientId,
-  web3AuthLoginType,
-  web3AuthVerifier,
-} from "@/constants";
-import {
-  CHAIN_NAMESPACES,
-  SafeEventEmitterProvider,
-  WALLET_ADAPTERS,
-} from "@web3auth/base";
-import { Web3AuthNoModal } from "@web3auth/no-modal";
-import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
-import {
-  SolanaPrivateKeyProvider,
-  SolanaWallet,
-} from "@web3auth/solana-provider";
-import React, { useEffect, useState } from "react";
-import Header from "./header/page";
-import WalletNav from "./WalletNav";
-import { disconnect } from "wagmi/actions";
-import { useAccount } from "wagmi";
 import { useAuth } from "@/context/AuthContext";
+import Link from "next/link";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { Wallet } from "lucide-react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import logo from "../public/assets/images/logo.png";
+import Image from "next/image";
+import LoginButton from "./LoginButton";
+import { SideNavBar } from "./SideNavBar";
 
 export default function Nav() {
-  const [web3auth, setWeb3auth] = useState<Web3AuthNoModal | null>(null);
-  const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(
-    null
-  );
-  const { address, isConnecting, isConnected } = useAccount();
-  const [solanaWallet, setSolanaWallet] = useState<SolanaWallet | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [walletAddress, setWalletAddress] = useState<string>("");
-  const { state, dispatch } = useAuth();
-
-  useEffect(() => {
-    async function initializeOpenLogin() {
-      const web3auth = new Web3AuthNoModal({
-        clientId: web3AuthClientId,
-        web3AuthNetwork: "sapphire_devnet",
-        chainConfig: {
-          chainNamespace: CHAIN_NAMESPACES.SOLANA,
-          chainId: "0x3",
-          rpcTarget: "https://api.devnet.solana.com",
-          displayName: "Solana Devnet",
-          blockExplorerUrl: "https://explorer.solana.com",
-          ticker: "SOL",
-          tickerName: "Solana Token",
-        },
-      });
-
-      const chainConfig = {
-        chainNamespace: CHAIN_NAMESPACES.SOLANA,
-        chainId: "0x3",
-        rpcTarget: "https://api.devnet.solana.com",
-        displayName: "Solana Devnet",
-        blockExplorer: "https://explorer.solana.com",
-        ticker: "SOL",
-        tickerName: "Solana Token",
-      };
-
-      const privateKeyProvider = new SolanaPrivateKeyProvider({
-        config: { chainConfig },
-      });
-
-      const openloginAdapter = new OpenloginAdapter({
-        adapterSettings: {
-          uxMode: "popup",
-          loginConfig: {
-            google: {
-              name: productName,
-              verifier: web3AuthVerifier,
-              typeOfLogin: web3AuthLoginType,
-              clientId: oauthClientId,
-            },
-          },
-        },
-        loginSettings: {
-          mfaLevel: "none",
-        },
-        privateKeyProvider,
-      });
-      web3auth.configureAdapter(openloginAdapter);
-      setWeb3auth(web3auth);
-
-      await web3auth.init();
-
-      setProvider(web3auth.provider);
-      //@ts-ignore
-      const solanaWallet = new SolanaWallet(web3auth.provider);
-
-      setSolanaWallet(solanaWallet);
-
-      if (web3auth.connected) {
-        const user = await web3auth.getUserInfo();
-
-        const accounts = await solanaWallet.requestAccounts();
-        setWalletAddress(accounts[0]);
-      }
-    }
-
-    initializeOpenLogin();
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (web3auth && web3auth.connected && !state.isAuthenticated) {
-      getAccounts().then((res: any) => {
-        setWalletAddress(res);
-        getUser(web3auth);
-      });
-    }
-  }, [provider, state.isAuthenticated, web3auth]);
-
-  async function getUser(web3auth: any) {
-    if (!web3auth) {
-      return;
-    }
-    const user = await web3auth?.getUserInfo();
-    dispatch({ type: "LOGIN", payload: user });
-  }
-
-  const signIn = async () => {
-    setLoading(true);
-    if (!web3auth) {
-      setLoading(false);
-      return;
-    }
-    if (web3auth.connected) {
-      setLoading(false);
-      return;
-    }
-    try {
-      const web3authProvider = await web3auth.connectTo(
-        WALLET_ADAPTERS.OPENLOGIN,
-        {
-          loginProvider: "google",
-        }
-      );
-      setProvider(web3authProvider);
-      const acc = (await getAccounts()) as any;
-      localStorage.setItem("isConnected", "true");
-      localStorage.setItem("isGoogleLogin", "true");
-      const user = await web3auth?.getUserInfo();
-      setWalletAddress(acc);
-    } catch (error) {
-      console.error("Login failed", error);
-    }
-    setLoading(false);
-  };
-
-  const getAccounts = async () => {
-    if (!provider) {
-      return;
-    }
-    try {
-      //@ts-ignore
-      const accounts = await solanaWallet.requestAccounts();
-      const priv = (await provider.request({
-        method: "private_key",
-      })) as string;
-
-      return await accounts[0];
-    } catch (error) {
-      return error;
-    }
-  };
-
-  const signOut = async () => {
-    await web3auth?.logout();
-    localStorage.removeItem("isGoogleLogin");
-    localStorage.removeItem("isConnected");
-    if (isConnected) {
-      await disconnect();
-    }
-    setWalletAddress("");
-    dispatch({ type: "LOGOUT" });
-  };
-
-  console.log(state.user);
+  const { state } = useAuth();
+  const { connected } = useWallet();
   if (state.isAuthenticated) {
     return (
-      <WalletNav
-        profileImage={state.user?.profileImage}
-        name={state.user?.name}
-        mail={state.user?.email}
-        signOut={signOut}
-      />
+      <div className="flex justify-between gap-4 p-4 rounded-lg ">
+        <Image src={logo} alt="logo" width={75} height={60} />
+        <div></div>
+        <div></div>
+        <div>
+          <div className="flex justify-between gap-2">
+            <WalletMultiButton
+              style={{ backgroundColor: "black", height: "40px" }}
+            >
+              {!connected && <Wallet />}
+            </WalletMultiButton>
+
+            <SideNavBar />
+          </div>
+        </div>
+      </div>
     );
   }
   return (
     <div>
-      <Header signIn={signIn} loading={loading} />
+      <div>
+        <header className="relative z-[9]">
+          <header className="py-4 border-b md:border-none fixed top-0 left-0 right-0 z-10 bg-white md:bg-white/0">
+            <div className="container mx-auto px-4 ">
+              <div className="flex justify-between items-center md:border md:p-2.5 rounded-xl max-w-2xl lg:max-w-4xl mx-auto md:bg-white/90 md:backdrop:blur-sm">
+                <div>
+                  <div className="border h-10 w-10 rounded-lg inline-flex justify-center items-center">
+                    <Image src={logo} alt="logo" width={75} height={60} />
+                  </div>
+                </div>
+                <div className="hidden md:block">
+                  <nav className="flex gap-8 text-sm">
+                    <Link
+                      className="text-black/70 hover:text-black transition"
+                      href="#"
+                    >
+                      Products
+                    </Link>
+                    <Link
+                      className="text-black/70 hover:text-black transition"
+                      href="#"
+                    >
+                      API & Docs
+                    </Link>
+                    <Link
+                      className="text-black/70 hover:text-black transition"
+                      href="#"
+                    >
+                      FAQ
+                    </Link>
+                    <Link
+                      className="text-black/70 hover:text-black transition"
+                      href="#"
+                    >
+                      Company
+                    </Link>
+                    <Link
+                      className="hidden lg:block text-black/70 hover:text-black transition"
+                      href="#"
+                    >
+                      Blogs
+                    </Link>
+                  </nav>
+                </div>
+                <div className="flex gap-4 items-center pr-2">
+                  <div>
+                    <WalletMultiButton
+                      style={{ backgroundColor: "black", height: "40px" }}
+                    >
+                      {!connected && <Wallet />}
+                    </WalletMultiButton>
+                  </div>
+                  <div>
+                    <LoginButton />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </header>
+        </header>
+      </div>
     </div>
   );
 }

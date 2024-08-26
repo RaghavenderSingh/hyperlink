@@ -24,14 +24,13 @@ import { useAccount } from "wagmi";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "./ui/button";
 import { FaGoogle } from "react-icons/fa6";
-import { setPrivateKey, setPublicKey } from "@/lib/KeyStore";
 
 export default function LoginButton() {
   const [web3auth, setWeb3auth] = useState<Web3AuthNoModal | null>(null);
   const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(
     null
   );
-  const { address, isConnecting, isConnected } = useAccount();
+  const { isConnected } = useAccount();
   const [solanaWallet, setSolanaWallet] = useState<SolanaWallet | null>(null);
   const [loading, setLoading] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string>("");
@@ -154,8 +153,6 @@ export default function LoginButton() {
         type: "LOGIN",
         payload: { user: user, publicKey: acc, privateKey: priv },
       });
-      setPrivateKey(priv);
-      setPublicKey(acc);
       setWalletAddress(acc);
     } catch (error) {
       console.error("Login failed", error);

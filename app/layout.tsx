@@ -5,7 +5,6 @@ import { WagmiWrapper } from "@/utils/wagmi/WagmiContext";
 import AppWalletProvider from "@/components/AppWalletProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/context/AuthContext";
-import Nav from "@/components/Nav";
 
 const inter = Inter({ subsets: ["latin"] });
 

@@ -35,7 +35,6 @@ import SendHyperlink from "@/components/linkAsWallet/SendHyperlink";
 import { convertUsdToSol } from "@/lib/KeyStore";
 import { Input } from "@/components/ui/input";
 import { LinkPreview } from "@/components/ui/link-preview";
-import preview from "../../public/assets/images/preview.png";
 
 interface HyperLinkData {
   keypair: {
@@ -388,11 +387,6 @@ const HyperLinkCard: React.FC = () => {
   };
   return (
     <div className="flex flex-col  m-10">
-      <div className="fixed top-4 right-4 flex items-end justify-end z-10">
-        <WalletMultiButton style={{ backgroundColor: "black", height: "40px" }}>
-          {!connected && <Wallet />}
-        </WalletMultiButton>
-      </div>
       <div>
         <Card className="w-full h-full max-w-xl mx-auto my-10">
           <CardHeader>
