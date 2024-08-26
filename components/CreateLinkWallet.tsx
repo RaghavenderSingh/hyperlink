@@ -81,8 +81,9 @@ export default function CreateLinkWallet() {
       <Card className="w-full max-w-md mx-auto p-6 space-y-4">
         <h2 className="text-2xl font-bold text-center">Create HyperLink</h2>
         <p className="text-center text-sm text-gray-600">
-          Send crypto & NFTs to anyone, even if they don't have a wallet. No app
-          needed!
+          {
+            "Send crypto & NFTs to anyone, even if they don't have a wallet. No app needed!"
+          }
         </p>
         <ConnectOptionsButton onSelect={handleSelection} />
         <div className="inline-flex w-full flex-wrap items-center justify-center gap-y-1 py-2 text-xs text-grey-700">

@@ -5,13 +5,14 @@ import axios from "axios";
 import { Button } from "./ui/button";
 import { TokenApiList, useFetchTokens } from "@/app/hooks/useFetchTokens";
 import { TokenListDialog } from "./TokenListDialog";
+import { TokenWithBalance } from "@/app/hooks/useTokens";
 
 export function Swap({
   tokenBalances,
 }: {
   tokenBalances: {
     totalBalance: number;
-    tokens: TokenWithbalance[];
+    tokens: TokenWithBalance[];
   } | null;
 }) {
   const { tokens, loading, error } = useFetchTokens();
@@ -154,7 +155,7 @@ function SwapInputRow({
 }: {
   tokenBalances: {
     totalBalance: number;
-    tokens: TokenWithbalance[];
+    tokens: TokenWithBalance[];
   } | null;
   onSelect: (asset: TokenApiList) => void;
   selectedToken?: TokenApiList;

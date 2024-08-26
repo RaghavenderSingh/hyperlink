@@ -1,11 +1,11 @@
-import { TokenWithbalance } from "@/app/hooks/useTokens";
+import { TokenWithBalance } from "@/app/hooks/useTokens";
 import { Button } from "./ui/button";
 
 export function TokenList({
   tokens,
   navigator,
 }: {
-  tokens: TokenWithbalance[];
+  tokens: TokenWithBalance[];
   navigator: (tabName: string) => void;
 }) {
   const validTokens = tokens.filter((t) => t.balance !== "0.00");
@@ -14,7 +14,7 @@ export function TokenList({
       {validTokens.length === 0 ? (
         <div className="flex flex-col justify-center items-center">
           <span className="font-bold text-2xl pt-4 pb-1">
-            You don't have any assets yet!
+            {"You don't have any assets yet!"}
           </span>
           <span className="text-medium pb-4">
             Start by buying or depositing funds:
@@ -48,7 +48,7 @@ export function TokenList({
   );
 }
 
-function TokenRow({ token }: { token: TokenWithbalance }) {
+function TokenRow({ token }: { token: TokenWithBalance }) {
   return (
     <div className="flex justify-between pb-2 mt-2">
       <div className="flex">

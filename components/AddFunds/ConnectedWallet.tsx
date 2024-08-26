@@ -8,7 +8,7 @@ import { Input } from "../ui/input";
 import CustomTextField from "../CustomTextField";
 import { Button } from "../ui/button";
 import { useTransferSOL } from "@/app/hooks/useTransferSOL";
-import { getPublicKey } from "@/lib/KeyStore";
+
 import BouncingDotsLoader from "../BouncingDotsLoader";
 
 type FundingOptionsProps = {

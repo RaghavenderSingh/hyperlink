@@ -8,7 +8,6 @@ import {
   Wallet,
 } from "lucide-react";
 import WalletModal from "../WalletModal";
-import { getPublicKey } from "@/lib/KeyStore";
 import { useAuth } from "@/context/AuthContext";
 
 type FundingOptionsProps = {

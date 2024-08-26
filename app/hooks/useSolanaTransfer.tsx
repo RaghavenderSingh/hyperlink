@@ -6,7 +6,6 @@ import {
   SystemProgram,
   Keypair,
 } from "@solana/web3.js";
-import { getPrivateKey, getPublicKey } from "@/lib/KeyStore";
 import { useAuth } from "@/context/AuthContext";
 
 export const useSolanaTransfer = () => {

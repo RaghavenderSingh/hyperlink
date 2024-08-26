@@ -141,8 +141,9 @@ const AllTokensComponent = ({
       <div ref={tokenRef} className="">
         <CommandList className="border shadow-md">
           {searchedTokens
-            ? searchedTokens.slice(0, currentTokens).map((token) => (
+            ? searchedTokens.slice(0, currentTokens).map((token, index) => (
                 <div
+                  key={index}
                   className="onhover: bg-gray-200"
                   onClick={() => {
                     setLocalSelectedToken(token);
@@ -161,8 +162,9 @@ const AllTokensComponent = ({
                 </div>
               ))
             : tokens &&
-              tokens.slice(0, currentTokens).map((token) => (
+              tokens.slice(0, currentTokens).map((token, tokenIndex) => (
                 <div
+                  key={tokenIndex}
                   className="onhover: bg-gray-200"
                   onClick={() => {
                     setLocalSelectedToken(token);

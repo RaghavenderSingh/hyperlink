@@ -1,5 +1,4 @@
 import WalletQR from "@/components/WalletQR";
-import { Clipboard } from "flowbite-react";
 import solcan from "@/public/assets/images/solscan.webp";
 import Image from "next/image";
 import { useState } from "react";
@@ -17,17 +16,14 @@ const WalletModal: React.FC<WalletModalProps> = ({
   onClose,
   publicKey,
 }) => {
-  if (!isVisible) return null;
   const [isCopied, setIsCopied] = useState(false);
-
   const shortenedKey = `${publicKey.slice(0, 4)}...${publicKey.slice(-4)}`;
-
   const handleCopy = () => {
     navigator.clipboard.writeText(publicKey);
     setIsCopied(true);
     setTimeout(() => setIsCopied(false), 2000);
   };
-
+  if (!isVisible) return null;
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 ">
       <div className="bg-white rounded-lg shadow-lg p-6 w-200">
