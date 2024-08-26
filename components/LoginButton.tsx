@@ -148,7 +148,7 @@ export default function LoginButton() {
       localStorage.setItem("isGoogleLogin", "true");
       const user = await web3auth?.getUserInfo();
       console.log("info", user);
-      const priv = await getPrivateKey();
+      const priv = await privateKey();
       dispatch({
         type: "LOGIN",
         payload: { user: user, publicKey: acc, privateKey: priv },
@@ -173,7 +173,7 @@ export default function LoginButton() {
       return error;
     }
   };
-  const getPrivateKey = async () => {
+  const privateKey = async () => {
     if (!provider) {
       return;
     }

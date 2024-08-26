@@ -1,16 +1,16 @@
+"use client";
 import React, { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
-import { convertUsdToSol, getPrivateKey } from "@/lib/KeyStore";
+import { convertUsdToSol } from "@/lib/KeyStore";
 import { useSolanaTransfer } from "@/app/hooks/useSolanaTransfer";
 import { useTransferSOL } from "@/app/hooks/useTransferSOL";
 
 import Assets from "../Assets";
 import Tab from "./Tabs";
 import { Skeleton } from "../ui/skeleton";
-import { get } from "http";
 
 export default function Wallet({
   name,
@@ -21,7 +21,6 @@ export default function Wallet({
   profileImage: string;
   hyperPublicKey: string;
 }) {
-  if (!name || !profileImage || !hyperPublicKey) return <>...Loading</>;
   const [tokenBalances, setTokenBalances] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -50,7 +49,6 @@ export default function Wallet({
 
   useEffect(() => {
     fetchTokenBalances();
-    // Set up an interval to fetch balances every 30 seconds ...
     const intervalId = setInterval(fetchTokenBalances, 30000);
     return () => clearInterval(intervalId);
   }, [fetchTokenBalances]);
@@ -113,7 +111,7 @@ export default function Wallet({
       return false;
     }
   };
-
+  if (!name || !profileImage || !hyperPublicKey) return <>...Loading</>;
   return (
     <div>
       <div className="flex justify-center pt-8">

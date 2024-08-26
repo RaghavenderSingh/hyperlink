@@ -1,23 +1,22 @@
 "use client";
 import { useAuth } from "@/context/AuthContext";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
-
-export const getPrivateKey = () => {
+function useAuthState() {
     const state = useAuth();
-    console.log("state", state);
-    if (state.state.privateKey) {
+    return state.state;
+}
 
-        return state.state.privateKey as string;
-    }
+// Utility function to get private key
+export function usePrivateKey() {
+    const authState = useAuthState();
+    return authState.privateKey as string;
+}
 
-};
-export const getPublicKey = () => {
-    const state = useAuth();
-    if (state.state.publicKey) {
-        return state.state.publicKey as string;
-    }
-
-};
+// Utility function to get public key
+export function usePublicKey() {
+    const authState = useAuthState();
+    return authState.publicKey as string;
+}
 export async function convertUsdToSol(usdAmount: string): Promise<string> {
     if (usdAmount === "" || parseFloat(usdAmount) === 0) {
         return "0";

@@ -4,7 +4,7 @@ import { ArrowLeft, ChevronRight, KeyRound, Link2 } from "lucide-react";
 type FundingOptionsProps = {
   setStep: (value: number) => void;
 };
-export default function ({ setStep }: FundingOptionsProps) {
+export default function Send({ setStep }: FundingOptionsProps) {
   return (
     <div className="flex w-full flex-col justify-start space-y-5 xs:space-y-0 xs:flex-row xs:space-x-10">
       <div

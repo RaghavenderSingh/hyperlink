@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Keypair, VersionedTransaction } from "@solana/web3.js";
 import { connection } from "@/lib/constants";
-import { getPrivateKey } from "@/lib/KeyStore";
+import { usePrivateKey } from "@/lib/KeyStore";
 import { Wallet } from '@project-serum/anchor';
 
 export async function POST(req: NextRequest) {
@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
     const data: {
         quoteResponse: any
     } = await req.json();
-    const privateKey = getPrivateKey();
+    const privateKey = usePrivateKey();
     if (privateKey === null) {
         return NextResponse.json({
             message: "You are not logged in"

@@ -399,8 +399,9 @@ const HyperLinkCard: React.FC = () => {
 
           <CardContent className="space-y-4">
             <p className="text-lg font-thin text-center">
-              The link to this page contains this value. Make sure you don't
-              lose it!
+              {
+                "The link to this page contains this value. Make sure you don'tlose it!"
+              }
             </p>
             <div className="flex justify-center items-center">
               <LinkPreview

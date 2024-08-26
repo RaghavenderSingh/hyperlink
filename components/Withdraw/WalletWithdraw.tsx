@@ -44,7 +44,7 @@ export default function WalletWithdraw({
             </div>
             <div className="flex w-full items-center justify-center text-left text-sm font-normal text-grey-700 xs:text-base">
               <span className="text-sm font-semibold text-grey-700 ">
-                TipLink's available SOL:{" "}
+                {" TipLink's available SOL:"}{" "}
               </span>
               <span className="text-sm font-bold text-grey-700">
                 {balance ? balance : "0.00"}

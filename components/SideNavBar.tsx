@@ -100,7 +100,7 @@ export function SideNavBar() {
                   </div>
                   <div>
                     <p className="font-bold text-lg">Hyperlink wallet</p>
-                    <p>The world's simplest wallet</p>
+                    <p>{"The world's simplest wallet"}</p>
                   </div>
                 </div>
               </Button>
@@ -112,7 +112,7 @@ export function SideNavBar() {
                   </div>
                   <div>
                     <p className="font-bold text-lg">Create a HyperLink</p>
-                    <p>Send crypto even if they don't have a wallet.</p>
+                    <p>{"Send crypto even if they don't have a wallet."}</p>
                   </div>
                 </div>
               </Button>
