@@ -48,8 +48,8 @@ export default function CreateLinkWallet() {
         "https://api.devnet.solana.com",
         "confirmed"
       );
-      const amt = await convertUsdToSol(amount);
-      const lamports = BigInt(Math.round(Number(amt) * LAMPORTS_PER_SOL));
+      let amt: number = Number(await convertUsdToSol(amount));
+      const lamports = BigInt(Math.round(amt * LAMPORTS_PER_SOL));
       console.log("amt", amt, lamports);
       const transaction = new Transaction().add(
         SystemProgram.transfer({
