@@ -11,21 +11,48 @@ This project consists of two main products designed for users interacting with t
 
 ### Introduction
 
-This feature allows users to create a Solana wallet easily using Web3Auth. Web3Auth simplifies the onboarding process by abstracting away the complexity of key management, enabling users to create and manage their wallets without directly dealing with private keys.
+This feature allows users to create a Solana wallet easily using Web3Auth. Web3Auth simplifies the onboarding process by abstracting away the complexity of key management, enabling users to create and manage their wallets without directly dealing with private keys. Importantly, this project is non-custodial, meaning private keys are never stored by the platform, ensuring that users have full control over their funds.
 
 ### How Web3Auth Works
 
-**Web3Auth** is a decentralized authentication infrastructure that provides a seamless user experience by integrating with OAuth providers (like Google, Facebook, etc.) and social logins. Here's how it works:
+**Web3Auth** is a decentralized authentication infrastructure that provides a seamless user experience by integrating with OAuth providers (like Google, Facebook, etc.) and social logins.
 
-1. **User Authentication**: Users authenticate using their social login credentials (e.g., Google).
-2. **Key Management**: Web3Auth handles the key management by splitting and distributing the private key across multiple nodes, ensuring no single entity has full control over the key.
-3. **Wallet Creation**: After authentication, Web3Auth generates a private key for the user, which is used to create a Solana wallet.
-4. **Interaction with Solana**: Users can interact with the Solana blockchain, sending and receiving tokens, viewing transaction history, and tracking wallet balances.
+#### Internal Key Management and the Torus Network
+
+Web3Auth uses the **Torus Network** for decentralized key management. Here’s how it works:
+
+1. **Private Key Sharding**:
+
+   - When a private key is generated, it is broken into multiple shards.
+   - These shards are distributed across different nodes in the Torus Network.
+
+2. **Decentralized Storage**:
+
+   - Shards are stored on a decentralized network of nodes, ensuring no single entity has control over the full key.
+   - This decentralization reduces the risk of a single point of failure.
+
+3. **Threshold Decryption**:
+
+   - The private key can be reconstructed using a threshold number of shards, even if some nodes are compromised or offline.
+   - This method ensures the security and availability of the private key.
+
+4. **Social Login Recovery**:
+   - If a user loses access to their device, they can recover their wallet by logging in via the same social OAuth provider.
+   - The Torus Network reassembles the private key using the required number of shards upon successful login.
+
+#### The Torus Network
+
+The **Torus Network** is the backbone of Web3Auth’s decentralized key management:
+
+- **Decentralized**: Multiple independent nodes manage the shards, preventing central control.
+- **Secure**: Threshold cryptography ensures the private key remains secure, even if some nodes are compromised.
+- **Scalable**: The network can handle a large number of users, ensuring fast and efficient key reconstruction and transaction signing.
 
 ### Key Benefits
 
 - **User-Friendly**: Simplifies wallet creation for non-technical users.
 - **Secure**: Distributes key management across multiple nodes, reducing the risk of key compromise.
+- **Non-Custodial**: Users have full control over their private keys, as they are never stored on the platform.
 - **Scalable**: Supports a large number of users with minimal configuration and setup.
 
 ## Product 2: Link-Based Crypto Sharing
