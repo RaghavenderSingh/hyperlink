@@ -10,11 +10,10 @@ export async function GET(req: NextRequest) {
     const supportedTokens = await getSupportedTokens();
     const balances = await Promise.all(supportedTokens.map(token => getAccountBalance(token, address)))
 
-
     const tokens = supportedTokens.map((token, index) => ({
         ...token,
-        balance: Number(balances[index]).toFixed(2),
-        usdBalance: (Number(balances[index]) * Number(token.price)).toFixed(2)
+        balance: balances[index].toFixed(2),
+        usdBalance: (balances[index] * Number(token.price)).toFixed(2)
     }));
 
     return NextResponse.json({
@@ -31,7 +30,7 @@ async function getAccountBalance(token: {
 }, address: string) {
     if (token.native) {
         let balance = await connection.getBalance(new PublicKey(address));
-        console.log("balance is " + balance / LAMPORTS_PER_SOL)
+        console.log("balance is " + balance)
         return balance / LAMPORTS_PER_SOL;
     }
     const ata = await getAssociatedTokenAddress(new PublicKey(token.mint), new PublicKey(address));
@@ -41,6 +40,6 @@ async function getAccountBalance(token: {
         // const mint = await getMint(connection, new PublicKey(token.mint));
         return Number(account.amount) / (10 ** token.decimals)
     } catch (e) {
-        return console.log(e);
+        return 0;
     }
 }
