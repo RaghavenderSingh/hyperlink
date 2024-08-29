@@ -41,6 +41,6 @@ async function getAccountBalance(token: {
         // const mint = await getMint(connection, new PublicKey(token.mint));
         return Number(account.amount) / (10 ** token.decimals)
     } catch (e) {
-        return 0;
+        return console.log(e);
     }
 }
