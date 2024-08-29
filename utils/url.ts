@@ -3,7 +3,7 @@ import _sodium from "libsodium-wrappers-sumo";
 import bs58 from 'bs58'
 
 const DEFAULT_HYPERLINK_KEYLENGTH = 32; // 32 bytes (256 bits)
-const DEFAULT_ORIGIN = "http://localhost:3000";
+const DEFAULT_ORIGIN = process.env.NEXT_PUBLIC_HYPERLINK_ORIGIN;
 export const HYPERLINK_ORIGIN =
     process !== undefined && process.env !== undefined
         ? process.env.HYPERLINK_ORIGIN_OVERRIDE ?? DEFAULT_ORIGIN
