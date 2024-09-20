@@ -1,209 +1,158 @@
 "use client";
-import {
-  oauthClientId,
-  productName,
-  web3AuthClientId,
-  web3AuthLoginType,
-  web3AuthVerifier,
-} from "@/constants";
-import {
-  CHAIN_NAMESPACES,
-  SafeEventEmitterProvider,
-  WALLET_ADAPTERS,
-} from "@web3auth/base";
+import React, { useEffect, useState } from "react";
 import { Web3AuthNoModal } from "@web3auth/no-modal";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import {
   SolanaPrivateKeyProvider,
   SolanaWallet,
 } from "@web3auth/solana-provider";
-import React, { useEffect, useState } from "react";
-import { disconnect } from "wagmi/actions";
-import { useAccount } from "wagmi";
-
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "./ui/button";
-import { FaGoogle } from "react-icons/fa6";
+import { FaPhone } from "react-icons/fa6";
+import { CHAIN_NAMESPACES, WALLET_ADAPTERS } from "@web3auth/base";
 
-export default function LoginButton() {
+const web3AuthClientId =
+  "BHQMa4DE2EnG4qb66kotFkN1fzA4S-ZRhVOr9TzaWIqeCHPp1mVWgNM0lyfjA-K1E4dErw6xoCC7spCeMylxmIs"; // Your Web3Auth Client ID
+
+export default function SolanaMobileLoginButton() {
   const [web3auth, setWeb3auth] = useState<Web3AuthNoModal | null>(null);
-  const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(
-    null
-  );
-  const { isConnected } = useAccount();
   const [solanaWallet, setSolanaWallet] = useState<SolanaWallet | null>(null);
   const [loading, setLoading] = useState(false);
+  const [initializing, setInitializing] = useState(true);
   const [walletAddress, setWalletAddress] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
   const { state, dispatch } = useAuth();
 
   useEffect(() => {
-    async function initializeOpenLogin() {
-      const web3auth = new Web3AuthNoModal({
-        clientId: web3AuthClientId,
-        web3AuthNetwork: "sapphire_devnet",
-        chainConfig: {
+    async function initializeWeb3Auth() {
+      try {
+        const chainConfig = {
           chainNamespace: CHAIN_NAMESPACES.SOLANA,
-          chainId: "0x3",
+          chainId: "0x3", // Solana Devnet
           rpcTarget: "https://api.devnet.solana.com",
           displayName: "Solana Devnet",
           blockExplorerUrl: "https://explorer.solana.com",
           ticker: "SOL",
           tickerName: "Solana Token",
-        },
-      });
+        };
 
-      const chainConfig = {
-        chainNamespace: CHAIN_NAMESPACES.SOLANA,
-        chainId: "0x3",
-        rpcTarget: "https://api.devnet.solana.com",
-        displayName: "Solana Devnet",
-        blockExplorer: "https://explorer.solana.com",
-        ticker: "SOL",
-        tickerName: "Solana Token",
-      };
+        const web3auth = new Web3AuthNoModal({
+          clientId: web3AuthClientId,
+          web3AuthNetwork: "sapphire_devnet",
+          chainConfig,
+        });
 
-      const privateKeyProvider = new SolanaPrivateKeyProvider({
-        config: { chainConfig },
-      });
+        const privateKeyProvider = new SolanaPrivateKeyProvider({
+          config: { chainConfig },
+        });
 
-      const openloginAdapter = new OpenloginAdapter({
-        adapterSettings: {
-          uxMode: "popup",
-          loginConfig: {
-            google: {
-              name: productName,
-              verifier: web3AuthVerifier,
-              typeOfLogin: web3AuthLoginType,
-              clientId: oauthClientId,
+        const openloginAdapter = new OpenloginAdapter({
+          privateKeyProvider,
+          adapterSettings: {
+            uxMode: "popup",
+            loginConfig: {
+              jwt: {
+                verifier: "hyperlink-oauth", // Replace with your Auth0 verifier name
+                typeOfLogin: "jwt",
+                clientId: "wbPJKjSwsmTwFMYGZIWnGPyp3Jmk5wLV", // Replace with your Auth0 client ID
+              },
             },
           },
-        },
-        loginSettings: {
-          mfaLevel: "none",
-        },
-        privateKeyProvider,
-      });
-      web3auth.configureAdapter(openloginAdapter);
-      setWeb3auth(web3auth);
+        });
 
-      await web3auth.init();
+        web3auth.configureAdapter(openloginAdapter);
+        setWeb3auth(web3auth);
 
-      setProvider(web3auth.provider);
-      //@ts-ignore
-      const solanaWallet = new SolanaWallet(web3auth.provider);
+        await web3auth.init();
 
-      setSolanaWallet(solanaWallet);
+        if (web3auth.provider) {
+          const solanaWallet = new SolanaWallet(web3auth.provider);
+          setSolanaWallet(solanaWallet);
 
-      if (web3auth.connected) {
-        const user = await web3auth.getUserInfo();
-
-        const accounts = await solanaWallet.requestAccounts();
-        setWalletAddress(accounts[0]);
-        console.log(accounts[0]);
+          if (web3auth.connected) {
+            const accounts = await solanaWallet.requestAccounts();
+            setWalletAddress(accounts[0]);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to initialize Web3Auth", error);
+        setError("Failed to initialize Web3Auth. Please try again later.");
+      } finally {
+        setInitializing(false);
       }
     }
 
-    initializeOpenLogin();
+    initializeWeb3Auth();
   }, []);
 
-  useEffect(() => {
-    if (web3auth && web3auth.connected && !state.isAuthenticated) {
-      getAccounts().then((res: any) => {
-        setWalletAddress(res);
-        getUser(web3auth);
-      });
-    }
-  }, [provider, state.isAuthenticated, web3auth]);
-
-  async function getUser(web3auth: any) {
-    if (!web3auth) {
-      return;
-    }
-    const user = await web3auth?.getUserInfo();
-  }
-
   const signIn = async () => {
-    setLoading(true);
-    while ((await web3auth?.status) !== "ready") {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
     if (!web3auth) {
-      setLoading(false);
+      setError("Web3Auth not initialized");
       return;
     }
-    if (web3auth.connected) {
-      setLoading(false);
-      return;
-    }
+    setLoading(true);
+    setError(null);
     try {
       const web3authProvider = await web3auth.connectTo(
         WALLET_ADAPTERS.OPENLOGIN,
         {
-          loginProvider: "google",
+          loginProvider: "jwt",
+          extraLoginOptions: {
+            domain: "https://hypelink.us.auth0.com", // Replace with your Auth0 domain
+            verifierIdField: "sub",
+            connection: "sms", // This specifies we want to use SMS (mobile number) login
+          },
         }
       );
-      setProvider(web3authProvider);
-      const acc = (await getAccounts()) as any;
-      localStorage.setItem("isConnected", "true");
-      localStorage.setItem("isGoogleLogin", "true");
-      const user = await web3auth?.getUserInfo();
-      console.log("info", user);
-      const priv = await privateKey();
-      dispatch({
-        type: "LOGIN",
-        payload: { user: user, publicKey: acc, privateKey: priv },
-      });
-      setWalletAddress(acc);
+
+      if (web3authProvider) {
+        const solanaWallet = new SolanaWallet(web3authProvider);
+        setSolanaWallet(solanaWallet);
+
+        const accounts = await solanaWallet.requestAccounts();
+        setWalletAddress(accounts[0]);
+
+        const user = await web3auth.getUserInfo();
+        const privateKey = await solanaWallet.request({
+          method: "solanaPrivateKey",
+        });
+
+        dispatch({
+          type: "LOGIN",
+          payload: { user, publicKey: accounts[0], privateKey },
+        });
+      }
     } catch (error) {
       console.error("Login failed", error);
-    }
-    setLoading(false);
-  };
-
-  const getAccounts = async () => {
-    if (!provider) {
-      return;
-    }
-    try {
-      //@ts-ignore
-      const accounts = await solanaWallet.requestAccounts();
-
-      return await accounts[0];
-    } catch (error) {
-      return error;
+      setError("Login failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
-  const privateKey = async () => {
-    if (!provider) {
-      return;
-    }
-    try {
-      //@ts-ignore
 
-      const priv = (await provider.request({
-        method: "private_key",
-      })) as string;
-      console.log("priv", priv);
-      return priv;
-    } catch (error) {
-      return error;
-    }
-  };
   const signOut = async () => {
-    console.log("signOut", web3auth?.status);
-    while ((await web3auth?.status) !== "connected") {
-      await new Promise((resolve) => setTimeout(resolve, 100));
+    if (!web3auth) {
+      setError("Web3Auth not initialized");
+      return;
     }
-
-    await web3auth?.logout();
-    localStorage.removeItem("isGoogleLogin");
-    localStorage.removeItem("isConnected");
-    if (isConnected) {
-      await disconnect();
+    try {
+      await web3auth.logout();
+      setWalletAddress("");
+      dispatch({ type: "LOGOUT" });
+    } catch (error) {
+      console.error("Logout failed", error);
+      setError("Logout failed. Please try again.");
     }
-    setWalletAddress("");
-    dispatch({ type: "LOGOUT" });
   };
+
+  if (initializing) {
+    return <div>Initializing...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500">{error}</div>;
+  }
+
   return (
     <div>
       {state.isAuthenticated ? (
@@ -211,12 +160,16 @@ export default function LoginButton() {
           Logout
         </Button>
       ) : (
-        <Button onClick={signIn} className="pl-2 py-6 text-sm md:text-base">
+        <Button
+          onClick={signIn}
+          className="pl-2 py-6 text-sm md:text-base"
+          disabled={loading}
+        >
           <span className="flex items-center gap-2">
             <span className="px-3 py-2 rounded-lg border bg-white text-black">
-              <FaGoogle />
+              <FaPhone />
             </span>
-            Sign up
+            {loading ? "Signing in..." : "Sign in with Mobile"}
           </span>
         </Button>
       )}

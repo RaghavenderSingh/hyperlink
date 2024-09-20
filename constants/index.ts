@@ -5,10 +5,11 @@ export const oauthClientId =
 export const web3AuthVerifier = "hyper-google-verifier";
 export const web3AuthLoginType = "google";
 export const web3AuthClientId =
-    process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID || "BHQMa4DE2EnG4qb66kotFkN1fzA4S-ZRhVOr9TzaWIqeCHPp1mVWgNM0lyfjA-K1E4dErw6xoCC7spCeMylxmIs";
+    process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID || "BIQyvQe9b6q1dns0VLpVsSQfQUmP9k1aPldTTkMUr5MlGXwEQ7Ahc5Kb6qp8rWQ2X6jhXsZndgffLEYYzt5ePLY";
 export const productName = "Hyper";
 export const rainbowKitProjectId = "fb3037b60ba3165d90a7f1bb1a727cc5";
 export enum LOGGED_IN {
     GOOGLE = "google",
     EXTERNAL_WALLET = "external_wallet",
 }
+//BHQMa4DE2EnG4qb66kotFkN1fzA4S-ZRhVOr9TzaWIqeCHPp1mVWgNM0lyfjA-K1E4dErw6xoCC7spCeMylxmIs
