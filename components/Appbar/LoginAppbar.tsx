@@ -3,8 +3,9 @@ import React, { useState } from "react";
 import Logo from "../icons/Logo";
 import OptionSheet from "./OptionSheet";
 import { LayoutGrid, Wallet, LucideIcon } from "lucide-react";
-import UserWalletDashboard from "../WalletCard/WalletCard";
+
 import { Session } from "next-auth";
+import UserWalletDashboard from "../WalletCard/UserWalletDashboard";
 
 interface TabButtonProps {
   value: string;
