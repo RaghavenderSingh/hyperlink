@@ -6,9 +6,7 @@ import { decodeToken, web3auth } from "@/lib/web3auth";
 import { initClients } from "@/lib/client";
 import { handleSignOut } from "@/actions";
 import { TokenWithBalance } from "@/lib/types";
-import DashboardHeader from "./DashboardHeader";
 import WalletOverview from "./WalletOverview";
-import AssetTabs from "./AssetTabs";
 import LoadingSkeleton from "./LoadingSkeleton";
 
 interface UserWalletDashboardProps {
@@ -149,13 +147,12 @@ const UserWalletDashboard: React.FC<UserWalletDashboardProps> = ({
             "rgba(0, 0, 0, 0.06) 0px 4px 40px, rgba(255, 255, 255, 0.8) 0px 0px 40px inset",
         }}
       >
-        <DashboardHeader
+        <WalletOverview
           session={session}
           totalBalanceUSD={totalBalanceUSD}
           publicKey={publicKey}
+          tokenBalances={tokenBalances}
         />
-
-        <AssetTabs tokenBalances={tokenBalances} publicKey={publicKey} />
       </div>
     </div>
   );
