@@ -1,16 +1,27 @@
+"use client";
+
+import { useTransition } from "react";
 import { signInAction } from "@/lib/signInAction";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { FaGoogle } from "react-icons/fa6";
 
-export default function SignIn() {
+export default function LoginButton() {
+  const [isPending, startTransition] = useTransition();
+
+  const handleSubmit = () => {
+    startTransition(() => {
+      signInAction();
+    });
+  };
+
   return (
-    <form action={signInAction}>
-      <Button type="submit">
-        <span className="flex items-center gap-2">
-          Login
-          <FaGoogle />
-        </span>
-      </Button>
-    </form>
+    <Button
+      onClick={handleSubmit}
+      disabled={isPending}
+      className="flex items-center gap-2 px-[20px] py-[23px]"
+    >
+      {isPending ? "Logging in..." : "Login"}
+      <FaGoogle />
+    </Button>
   );
 }

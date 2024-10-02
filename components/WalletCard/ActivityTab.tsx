@@ -81,7 +81,7 @@ const ActivityTab = ({ publicKey }: { publicKey: string | null }) => {
       </div>
     );
   }
-
+  console.log("transactions", transactions);
   return (
     <div className="w-full pt-5">
       <div

@@ -1,11 +1,18 @@
 "use client";
-import React from "react";
+import React, { useTransition } from "react";
 import { Button } from "../ui/button";
 import { CardDemo } from "../AnimatedCard";
 import { FaGoogle } from "react-icons/fa6";
 import { signInAction } from "@/lib/signInAction";
 
 export default function Hero() {
+  const [isPending, startTransition] = useTransition();
+
+  const handleSubmit = () => {
+    startTransition(() => {
+      signInAction();
+    });
+  };
   return (
     <section className="items-center  mt-40">
       <div className="container mx-auto px-4">
@@ -22,12 +29,14 @@ export default function Hero() {
           </p>
         </div>
         <div className="flex gap-3 items-center justify-center mt-5">
-          <form action={signInAction}>
-            <Button className="flex items-center gap-2 px-[20px] py-[23px]">
-              Login
-              <FaGoogle />
-            </Button>
-          </form>
+          <Button
+            onClick={handleSubmit}
+            disabled={isPending}
+            className="flex items-center gap-2 px-[20px] py-[23px]"
+          >
+            {isPending ? "Logging in..." : "Login"}
+            <FaGoogle />
+          </Button>
           {/* <Button
             onClick={() => router.push("/create")}
             className="pl-2 py-6 text-sm md:text-base"

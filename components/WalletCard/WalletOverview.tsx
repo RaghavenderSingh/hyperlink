@@ -16,7 +16,7 @@ const WalletOverview: React.FC<WalletOverviewProps> = ({
     <div className="flex w-full items-start justify-between">
       <p className="mb-0 inline-flex items-center justify-start text-left text-xs font-semibold text-gray-400 mobile:mb-3 mobile:text-sm">
         <Wallet className="mr-1 h-4 w-4" />
-        TipLink Account Assets
+        HyperLink Account Assets
       </p>
     </div>
     <div className="flex w-full items-center justify-between">

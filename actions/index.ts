@@ -1,10 +1,18 @@
-"use server";
+// File: lib/authActions.ts
 
-import { signIn, signOut } from "@/auth";
+"use client";
+
+import { signIn, signOut } from "next-auth/react";
 import { web3auth } from "@/lib/web3auth";
 
 export async function handleSignIn() {
-  await signIn("google");
+  try {
+    await signIn("google", { redirect: false });
+    // After successful sign-in, you might want to update some client-side state
+    // or trigger a re-render of your component
+  } catch (error) {
+    console.error("Error during sign in:", error);
+  }
 }
 
 export async function handleSignOut() {
@@ -12,9 +20,17 @@ export async function handleSignOut() {
     if (web3auth.status === "connected") {
       await web3auth.logout();
     }
-  } catch (error) {
-    console.error("Error during Web3Auth logout:", error);
-  } finally {
     await signOut({ redirect: false });
+    // After successful sign-out, you might want to update some client-side state
+    // or trigger a re-render of your component
+  } catch (error) {
+    console.error("Error during sign out:", error);
   }
+}
+
+export function checkWeb3AuthStatus() {
+  if (web3auth) {
+    return web3auth.status;
+  }
+  return "disconnected";
 }
