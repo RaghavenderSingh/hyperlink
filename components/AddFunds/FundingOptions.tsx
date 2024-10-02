@@ -4,7 +4,11 @@ import { Wallet } from "lucide-react";
 import GroupButton from "../GroupButton";
 import WalletModal from "../WalletModal";
 
-const FundingOptions: React.FC = () => {
+interface FundingOptionsProps {
+  publicKey: string | null;
+}
+
+function FundingOptions({ publicKey }: FundingOptionsProps) {
   const [showModal, setShowModal] = useState<boolean>(false);
 
   return (
@@ -63,13 +67,13 @@ const FundingOptions: React.FC = () => {
           />
         </div>
         <WalletModal
-          publicKey=""
+          publicKey={publicKey ? publicKey : ""}
           isVisible={showModal}
           onClose={() => setShowModal(false)}
         />
       </div>
     </div>
   );
-};
+}
 
 export default FundingOptions;

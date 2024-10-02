@@ -33,7 +33,7 @@ const WalletOverview: React.FC<WalletOverviewProps> = ({
       case "add":
         return (
           <div>
-            <FundingOptions />
+            <FundingOptions publicKey={publicKey} />
           </div>
         );
       case "withdraw":

@@ -58,7 +58,18 @@ const WalletModal: React.FC<WalletModalProps> = ({
         <div className="flex flex-col items-center bg-gray-100 rounded-lg p-4">
           <div className="mb-8">
             <div className="flex flex-col items-center justify-center">
-              <QRCode qrStyle="dots" value={""} size={200} />
+              <QRCode
+                logoImage="/icons/logo.png"
+                logoHeight={50}
+                logoWidth={90}
+                qrStyle="squares"
+                logoPaddingStyle="square"
+                ecLevel="L"
+                eyeColor="#e32a16"
+                eyeRadius={10}
+                value={publicKey}
+                size={200}
+              />
             </div>
           </div>
           <div className="relative w-full">
