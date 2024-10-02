@@ -1,5 +1,5 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { Connection, PublicKey, ParsedInstruction, PartiallyDecodedInstruction, clusterApiUrl } from '@solana/web3.js';
+
+import { Connection, PublicKey, ParsedInstruction, clusterApiUrl } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { TokenDetails } from '@/lib/types';
 import { NextRequest, NextResponse } from 'next/server';
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
     try {
         userPublicKey = new PublicKey(publicKey);
     } catch (error) {
-        return NextResponse.json({ error: 'Invalid public key format' }, { status: 400 });
+        return NextResponse.json({ error: 'Invalid public key format', err: error }, { status: 400 });
     }
 
     try {
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
         const transactions = await connection.getSignaturesForAddress(userPublicKey, { limit: 20 });
 
         // Fetch token accounts to get token balances
-        const tokenAccounts = await connection.getParsedTokenAccountsByOwner(userPublicKey, { programId: TOKEN_PROGRAM_ID });
+
 
         const transactionDetails = await Promise.all(transactions.map(async (tx) => {
             try {

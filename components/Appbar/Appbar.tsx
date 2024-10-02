@@ -1,13 +1,9 @@
 import Link from "next/link";
 import Logo from "../icons/Logo";
-import { Menu } from "lucide-react";
 import { auth } from "@/auth";
-import ProfileDropDown from "../common/ProfileDropDown";
 import SignIn from "../auth/signin-button";
 
 export default async function Appbar() {
-  const session = await auth();
-
   return (
     <header className="w-screen py-4 border-b md:border-none fixed top-0 left-0 right-0 bg-white md:bg-white z-50">
       <div className="container pl-32 px-4">

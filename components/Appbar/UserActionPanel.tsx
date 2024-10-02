@@ -9,10 +9,9 @@ import {
   ArrowRight,
   Briefcase,
   Newspaper,
-  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { handleSignOut } from "@/actions";
+
 import { Session } from "next-auth";
 import Logo from "../icons/Logo";
 import SignOut from "../auth/signout-button";
