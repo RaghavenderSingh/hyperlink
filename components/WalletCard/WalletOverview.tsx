@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Wallet, Search } from "lucide-react";
+import {
+  Wallet,
+  Search,
+  Send,
+  PlusCircle,
+  ArrowDownCircle,
+  Shuffle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-hot-toast";
 import AssetTabs from "./AssetTabs";
@@ -8,6 +15,7 @@ import { Session } from "next-auth";
 import { Card, CardContent } from "../ui/card";
 import Image from "next/image";
 import FundingOptions from "../AddFunds/FundingOptions";
+import WithdrawOptions from "../WithdrawOptions/WithdrawOptions";
 
 interface WalletOverviewProps {
   totalBalanceUSD: number;
@@ -33,11 +41,15 @@ const WalletOverview: React.FC<WalletOverviewProps> = ({
       case "add":
         return (
           <div>
-            <FundingOptions publicKey={publicKey} />
+            <FundingOptions HyperLinkPublicKey={publicKey} />
           </div>
         );
       case "withdraw":
-        return <div>Withdraw Content</div>;
+        return (
+          <div>
+            <WithdrawOptions HyperLinkPublicKey={publicKey} />
+          </div>
+        );
       case "swap":
         return <div>Swap Content</div>;
       default:
@@ -45,54 +57,61 @@ const WalletOverview: React.FC<WalletOverviewProps> = ({
     }
   };
 
-  const renderButton = (tabName: string, label: string) => (
+  const renderButton = (
+    tabName: string,
+    label: string,
+    icon: React.ReactNode
+  ) => (
     <Button
       variant={activeTab === tabName ? "default" : "outline"}
-      className={`h-11 flex-1 mx-1 ${
+      className={`h-15 flex-1  ${
         activeTab === tabName ? "bg-primary text-primary-foreground" : ""
-      }`}
+      } flex flex-col items-center justify-center p-2 sm:flex-row sm:justify-center`}
       onClick={() => setActiveTab(tabName)}
     >
-      {label}
+      <div className="flex items-center justify-center w-5 h-5  sm:hidden">
+        {icon}
+      </div>
+      <span className="text-[10px] sm:text-xs">{label}</span>
     </Button>
   );
 
   return (
     <div>
-      <Card className="rounded-xl bg-white p-5 sm:p-8">
+      <Card className="rounded-xl bg-white p-4 sm:p-8">
         <CardContent className="p-0">
-          <h3 className="mb-6 w-full text-left text-base font-bold text-gray-800 mobile:text-[26px]">
-            <div className="flex items-center justify-start gap-2 mobile:gap-4">
+          <h3 className="mb-4 w-full text-left text-base font-bold text-gray-800 sm:text-[26px]">
+            <div className="flex items-center justify-start gap-2 sm:gap-4">
               <Image
                 alt="user avatar"
-                className="rounded-full border border-gray-200 h-[68px] w-[68px] mobile:h-[68px] mobile:w-[68px]"
+                className="rounded-full border border-gray-200 h-[50px] w-[50px] sm:h-[68px] sm:w-[68px]"
                 src={session?.user?.image ? session?.user?.image : ""}
                 width={68}
                 height={68}
               />
-              <p className="text-xl font-bold text-gray-800 mobile:text-[26px]">
+              <p className="text-lg font-bold text-gray-800 sm:text-[26px]">
                 Welcome back, {session?.user?.name}!
               </p>
             </div>
           </h3>
           <div className="flex w-full items-start justify-between">
-            <p className="mb-0 inline-flex items-center justify-start text-left text-xs font-semibold text-gray-400 mobile:mb-3 mobile:text-sm">
+            <p className="mb-0 inline-flex items-center justify-start text-left text-xs font-semibold text-gray-400 sm:mb-3 sm:text-sm">
               <Wallet className="mr-1 h-4 w-4" />
               HyperLink Account Assets
             </p>
           </div>
           <div className="flex w-full items-center justify-between">
             <div>
-              <h1 className="text-[40px] font-bold text-gray-900 mobile:text-6xl">
+              <h1 className="text-3xl font-bold text-gray-900 sm:text-6xl">
                 ${totalBalanceUSD?.toFixed(2)}
-                <span className="ml-2 text-2xl text-gray-600 mobile:text-4xl">
+                <span className="ml-1 text-xl text-gray-600 sm:text-4xl">
                   USD
                 </span>
               </h1>
             </div>
             <Button
               variant="outline"
-              className="flex items-center justify-center bg-gray-50 px-2.5 py-2.5 text-gray-600 hover:bg-gray-100 active:bg-gray-200 mobile:px-3 rounded-2xl"
+              className="flex items-center justify-center bg-gray-50 px-2 py-2 text-gray-600 hover:bg-gray-100 active:bg-gray-200 sm:px-3 rounded-xl"
               onClick={() => {
                 if (publicKey) {
                   navigator.clipboard.writeText(publicKey);
@@ -100,17 +119,25 @@ const WalletOverview: React.FC<WalletOverviewProps> = ({
                 }
               }}
             >
-              <Search className="h-5 w-5" />
+              <Search className="h-4 w-4 sm:h-5 sm:w-5" />
               <span className="ml-1 hidden text-xs font-semibold text-gray-600 sm:inline">
                 {publicKey ? "Copy Public Key" : "Loading Public Key..."}
               </span>
             </Button>
           </div>
-          <div className="mt-5 flex w-full items-start justify-between overflow-hidden mobile:mt-6 mobile:gap-2 sm:items-center">
-            {renderButton("assets", "Send")}
-            {renderButton("add", "Add Funds")}
-            {renderButton("withdraw", "Withdraw")}
-            {renderButton("swap", "Swap")}
+          <div className="mt-4 flex w-full items-start justify-between gap-1 overflow-hidden sm:mt-6 sm:gap-2 sm:items-center">
+            {renderButton("assets", "Send", <Send className="h-4 w-4" />)}
+            {renderButton(
+              "add",
+              "Add Funds",
+              <PlusCircle className="h-4 w-4" />
+            )}
+            {renderButton(
+              "withdraw",
+              "Withdraw",
+              <ArrowDownCircle className="h-4 w-4" />
+            )}
+            {renderButton("swap", "Swap", <Shuffle className="h-4 w-4" />)}
           </div>
         </CardContent>
       </Card>

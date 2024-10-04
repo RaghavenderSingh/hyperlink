@@ -37,7 +37,7 @@ const LoginAppbar: React.FC<UserInfoProps> = ({ session }) => {
 
       {/* Desktop layout */}
       <div className="hidden sm:flex items-center justify-between p-4 bg-white">
-        <div className="flex items-center justify-center w-40 h-12 border rounded-xl bg-white/90 backdrop-blur-sm">
+        <div className="flex items-center justify-center p-2 w-auto h-auto border rounded-xl bg-white/90 backdrop-blur-sm">
           <Logo />
         </div>
         <div className="flex-grow flex justify-center mx-4">

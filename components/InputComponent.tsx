@@ -1,14 +1,4 @@
 import React, { useState, useEffect, useRef, ChangeEvent } from "react";
-import {
-  Box,
-  Flex,
-  Input,
-  Text,
-  IconButton,
-  Button,
-  HStack,
-  chakra,
-} from "@chakra-ui/react";
 import { ArrowUpDown } from "lucide-react";
 import { convertUsdToSol } from "@/lib/KeyStore";
 
@@ -23,11 +13,9 @@ const CustomTextField: React.FC<CustomTextFieldProps> = ({
   setAmount,
   amount,
 }) => {
-  const [value, setValue] = useState("");
-  const [solValue, setSolValue] = useState<string>(amount || "0");
-  const [cursorPosition, setCursorPosition] = useState<number>(0);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [isFlipped, setIsFlipped] = useState<boolean>(false);
+  const [value, setValue] = useState(amount || "");
+  const [solValue, setSolValue] = useState("0");
+  const [isFlipped, setIsFlipped] = useState(false);
   const [activeButton, setActiveButton] = useState<QuickAmount | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const spanRef = useRef<HTMLSpanElement>(null);
@@ -37,25 +25,19 @@ const CustomTextField: React.FC<CustomTextFieldProps> = ({
     if (isNaN(numericValue) || numericValue === 0) {
       return "";
     }
-    return numericValue.toString();
+    return numericValue.toFixed(2);
   };
 
   const handleInputChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value.replace(/[^0-9.]/g, "");
-    setAmount(newValue);
     setValue(newValue);
-    setCursorPosition(e.target.selectionStart || 0);
-    const sol = await convertUsdToSol(newValue);
-    setSolValue(sol);
-  };
-
-  const handleInputFocus = () => {
-    setIsEditing(true);
-  };
-
-  const handleInputBlur = () => {
-    setIsEditing(false);
-    setValue(formatValue(value));
+    setAmount(newValue);
+    if (newValue === "") {
+      setSolValue("0");
+    } else {
+      const sol = await convertUsdToSol(newValue);
+      setSolValue(sol);
+    }
   };
 
   const handleToggle = () => {
@@ -63,144 +45,110 @@ const CustomTextField: React.FC<CustomTextFieldProps> = ({
   };
 
   const handleQuickAmount = async (amount: QuickAmount) => {
-    const newValue = formatValue(amount.toString());
+    const newValue = amount.toString();
     setValue(newValue);
-    setActiveButton(amount);
     setAmount(newValue);
-
+    setActiveButton(amount);
     const sol = await convertUsdToSol(newValue);
     setSolValue(sol);
   };
-
+  //fix this
   useEffect(() => {
-    if (inputRef.current && isEditing) {
-      inputRef.current.setSelectionRange(cursorPosition, cursorPosition);
-    }
-  }, [cursorPosition, isEditing]);
-
-  useEffect(() => {
-    if (!isEditing) {
-      const numericValue = parseFloat(value);
-      if ([1, 2, 5].includes(numericValue)) {
-        setActiveButton(numericValue as QuickAmount);
+    const updateSolValue = async () => {
+      if (value) {
+        const sol = await convertUsdToSol(value);
+        setSolValue(sol);
       } else {
-        setActiveButton(null);
+        setSolValue("0");
       }
-    }
-  }, [value, isEditing]);
+    };
+    updateSolValue();
+  }, [value]);
 
   useEffect(() => {
     if (spanRef.current && inputRef.current) {
-      const spanWidth = spanRef.current.offsetWidth;
-      inputRef.current.style.width = `${spanWidth}px`;
+      const width = spanRef.current.offsetWidth;
+      inputRef.current.style.width = `${Math.max(width + 2, 20)}px`;
     }
   }, [value]);
 
   const isZeroValue = parseFloat(value) === 0 || value === "";
 
   return (
-    <Box>
-      <Flex
-        position="relative"
-        className="w-full border rounded-t-lg border-gray-200 bg-white p-4 border-b-0 border-b-transparent"
-        minH="80px"
-        alignItems="center"
-        justifyContent="center"
-        borderWidth={1}
-        borderColor="gray.200"
-        bg="white"
-        py={1}
-        pb={5}
-        roundedTop="lg"
-      >
-        <Flex
-          alignItems="center"
-          justifyContent="center"
-          fontSize="3xl"
-          w="full"
-          py={2}
-          textAlign="center"
-          fontWeight="light"
-        >
-          <Text transition="opacity 0.2s" opacity={isZeroValue ? 0.3 : 1}>
+    <div className="w-full">
+      <div className="relative w-full border rounded-t-lg border-gray-200 bg-white p-4 border-b-0 min-h-[80px] flex items-center justify-center">
+        <div className="flex items-center justify-center text-3xl w-full py-2 text-center font-light">
+          <span
+            className={`transition-opacity duration-200 ${
+              isZeroValue ? "opacity-30" : "opacity-100"
+            }`}
+          >
             $
-          </Text>
-          <Box position="relative" display="inline-block">
-            <chakra.span
+          </span>
+          <div className="relative inline-block">
+            <span
               ref={spanRef}
-              visibility="hidden"
-              position="absolute"
-              whiteSpace="pre"
+              className="invisible absolute left-0 top-0 text-3xl font-light"
+              aria-hidden="true"
             >
-              {isEditing ? value : formatValue(value) || "0"}
-            </chakra.span>
-            <Input
+              {value || "0"}
+            </span>
+            <input
               ref={inputRef}
-              className="text-3xl"
+              className="text-3xl text-center border-none outline-none"
+              style={{ minWidth: "20px" }}
               inputMode="decimal"
-              textAlign="center"
-              border="none"
-              outline="none"
-              _disabled={{ opacity: 1 }}
-              minW="2ch"
               placeholder="0"
-              value={isEditing ? value : formatValue(value)}
+              value={value}
               onChange={handleInputChange}
-              onFocus={handleInputFocus}
-              onBlur={handleInputBlur}
             />
-          </Box>
-          <Text transition="opacity 0.2s" opacity={isZeroValue ? 0.3 : 1}>
+          </div>
+          <span
+            className={`transition-opacity duration-200 ${
+              isZeroValue ? "opacity-30" : "opacity-100"
+            }`}
+          >
             USD
-          </Text>
-        </Flex>
-        <Text position="absolute" bottom={2} className="text-gray-400 text-xs">
+          </span>
+        </div>
+        <div className="absolute bottom-2 text-gray-400 text-xs">
           ~{solValue} SOL
-        </Text>
-        <IconButton
-          icon={
-            <div className="bg-gray-200 p-2 rounded-full ml-2">
-              {" "}
-              <ArrowUpDown size={14} />
-            </div>
-          }
-          aria-label="Toggle"
-          position="absolute"
-          right={2}
-          top="50%"
-          transform={`translateY(-50%) ${isFlipped ? "rotate(180deg)" : ""}`}
-          bg="gray.100"
-          size="sm"
-          color="gray.600"
-          _hover={{ bg: "gray.200", color: "gray.800" }}
-          _active={{ bg: "gray.300" }}
+        </div>
+        <button
+          className="absolute right-2 top-1/2 -translate-y-1/2 bg-gray-100 p-2 rounded-full hover:bg-gray-200 active:bg-gray-300 transition-all duration-200"
           onClick={handleToggle}
-          transition="all 0.2s"
-        />
-      </Flex>
-      <HStack spacing={0} w="full">
+        >
+          <ArrowUpDown
+            size={14}
+            className={`transform ${
+              isFlipped ? "rotate-180" : ""
+            } transition-transform duration-200`}
+          />
+        </button>
+      </div>
+      <div className="flex w-full">
         {[1, 2, 5].map((amount) => (
-          <Button
+          <button
             key={amount}
-            flex={1}
-            roundedTop="none"
-            roundedBottomLeft={amount === 1 ? "lg" : undefined}
-            roundedBottomRight={amount === 5 ? "lg" : undefined}
-            borderWidth={1}
-            borderColor="gray.200"
-            borderLeft={amount !== 1 ? 0 : undefined}
-            py={2}
-            bg={activeButton === amount ? "gray.200" : "white"}
-            _hover={{ bg: "gray.100" }}
-            _active={{ bg: "gray.200" }}
+            className={`
+              flex-1 py-2 border border-gray-200
+              ${amount === 1 ? "rounded-bl-lg" : ""}
+              ${amount === 5 ? "rounded-br-lg" : ""}
+              ${amount !== 1 ? "border-l-0" : ""}
+              ${
+                activeButton === amount
+                  ? "bg-gray-200"
+                  : "bg-white hover:bg-gray-100 active:bg-gray-200"
+              }
+              transition-colors duration-200
+            `}
             onClick={() => handleQuickAmount(amount as QuickAmount)}
-            transition="background-color 0.2s"
           >
             ${amount}
-          </Button>
+          </button>
         ))}
-      </HStack>
-    </Box>
+      </div>
+    </div>
   );
 };
 
