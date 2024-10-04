@@ -32,20 +32,7 @@ const Hero = (props: IHeader) => {
           </p>
         </div>
         <div className="flex gap-3 items-center justify-center mt-5">
-          <Button onClick={() => {}} className="pl-2 py-6 text-sm md:text-base">
-            {loading ? (
-              <div>
-                <BouncingDotsLoader />
-              </div>
-            ) : (
-              <span className="flex items-center gap-2">
-                <div className="px-3 py-2 rounded-lg border bg-white text-black">
-                  <FaGoogle />
-                </div>
-                Sign up with Google
-              </span>
-            )}
-          </Button>
+          
           <Button
             onClick={() => router.push("/create")}
             className="pl-2 py-6 text-sm md:text-base"
