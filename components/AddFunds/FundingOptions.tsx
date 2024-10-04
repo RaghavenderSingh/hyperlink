@@ -1,17 +1,30 @@
 import React, { useState } from "react";
 import { Wallet } from "lucide-react";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 
 import GroupButton from "../GroupButton";
 import WalletModal from "../WalletModal";
 import ExternalWalletTab from "./ExternalWalletTab";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 interface FundingOptionsProps {
-  publicKey: string | null;
+  HyperLinkPublicKey: string | null;
 }
 
-function FundingOptions({ publicKey }: FundingOptionsProps) {
+function FundingOptions({ HyperLinkPublicKey }: FundingOptionsProps) {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showExternalWallet, setShowExternalWallet] = useState<boolean>(false);
+
+  const { publicKey } = useWallet();
+  const { setVisible } = useWalletModal();
+
+  function handleShowExternalWallet() {
+    if (publicKey) {
+      setShowExternalWallet(true);
+    } else {
+      setVisible(true); // This will open the wallet connection modal
+    }
+  }
 
   return (
     <div
@@ -34,13 +47,13 @@ function FundingOptions({ publicKey }: FundingOptionsProps) {
             <GroupButton
               icon={<Wallet className="h-5 w-5 text-grey-800" />}
               title="From External Account/Wallet"
-              description="Deposit assets from your connected wallet or from your Coinbase account."
+              description="Deposit assets from your connected wallet."
               imageSources={[
                 "/icons/backpack.png",
                 "icons/pahntom.png",
                 "icons/solflare.png",
               ]}
-              onClick={() => setShowExternalWallet(true)}
+              onClick={handleShowExternalWallet}
             />
             <GroupButton
               icon={
@@ -75,7 +88,7 @@ function FundingOptions({ publicKey }: FundingOptionsProps) {
             />
           </div>
           <WalletModal
-            publicKey={publicKey ? publicKey : ""}
+            publicKey={HyperLinkPublicKey ? HyperLinkPublicKey : ""}
             isVisible={showModal}
             onClose={() => setShowModal(false)}
           />
