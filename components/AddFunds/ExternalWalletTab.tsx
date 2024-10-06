@@ -4,15 +4,22 @@ import CustomTextField from "../InputComponent";
 import { Button } from "../ui/button";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import BouncingDotsLoader from "../BouncingDotsLoader";
-import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { ArrowLeft } from "lucide-react";
 import { Combobox } from "../Combobox";
-import { convertUsdToSol } from "@/lib/KeyStore";
+import { convertUsdToSol, convertSolToUsd } from "@/lib/KeyStore";
 import { useTransferSOL } from "@/app/hooks/useTransferSOL";
 
 interface FundingOptionsProps {
   HyperLinkPublicKey: string | null;
   setShowExternalWallet: React.Dispatch<React.SetStateAction<boolean>>;
+}
+interface Token {
+  value: string;
+  label: string;
+  symbol: string;
+  logoURI: string;
+  balance: number;
 }
 
 export default function ExternalWalletTab({
@@ -20,31 +27,41 @@ export default function ExternalWalletTab({
   setShowExternalWallet,
 }: FundingOptionsProps) {
   const [amount, setAmount] = useState("");
+  const [selectedToken, setSelectedToken] = useState<Token | null>(null);
   const { publicKey } = useWallet();
   const [balance, setBalance] = useState(0);
   const { connection } = useConnection();
   const [loading, setLoading] = useState(false);
   const { transferSOL, isTransferring, error } = useTransferSOL();
+  const [transferredAmount, setTransferredAmount] = useState<number | null>(
+    null
+  );
 
   useEffect(() => {
     if (!connection || !publicKey) {
       return;
     }
 
-    connection.onAccountChange(
+    const updateBalance = (updatedAccountInfo: any) => {
+      setBalance(updatedAccountInfo.lamports / LAMPORTS_PER_SOL);
+    };
+
+    const subscriptionId = connection.onAccountChange(
       publicKey,
-      (updatedAccountInfo) => {
-        setBalance(updatedAccountInfo.lamports / LAMPORTS_PER_SOL);
-      },
+      updateBalance,
       "confirmed"
     );
 
     connection.getAccountInfo(publicKey).then((info) => {
-      if (!info) {
-        return;
+      if (info) {
+        setBalance(info.lamports / LAMPORTS_PER_SOL);
       }
-      setBalance(info.lamports / LAMPORTS_PER_SOL);
     });
+
+    // Cleanup function
+    return () => {
+      connection.removeAccountChangeListener(subscriptionId);
+    };
   }, [connection, publicKey]);
 
   const handleDeposit = async () => {
@@ -63,14 +80,36 @@ export default function ExternalWalletTab({
       }
 
       const amtInLamports = Math.round(amtInSol * LAMPORTS_PER_SOL);
+
+      // Get the initial balance
+      const initialBalance = await connection.getBalance(
+        new PublicKey(HyperLinkPublicKey)
+      );
+
+      // Perform the transfer
       await transferSOL(HyperLinkPublicKey, amtInLamports);
 
       if (error) {
         console.error("Transfer error:", error);
         // Handle error, maybe show it to the user
       } else {
-        console.log("Transfer successful");
-        // Maybe update UI to show success
+        // Get the final balance after transfer
+        const finalBalance = await connection.getBalance(
+          new PublicKey(HyperLinkPublicKey)
+        );
+
+        // Calculate the actual transferred amount
+        const transferredLamports = finalBalance - initialBalance;
+        const transferredSol = transferredLamports / LAMPORTS_PER_SOL;
+
+        // Convert back to USD for display
+        const transferredUsd = await convertSolToUsd(transferredSol.toString());
+        setTransferredAmount(parseFloat(transferredUsd));
+
+        console.log(
+          `Transfer successful. Transferred amount: ${transferredUsd} USD`
+        );
+        // Update UI to show success and transferred amount
       }
     } catch (err) {
       console.error("Deposit error:", err);
@@ -104,7 +143,10 @@ export default function ExternalWalletTab({
         </div>
         <div className="flex w-full flex-col justify-start space-y-5 xs:space-y-0 xs:flex-row xs:space-x-10">
           <div>
-            <Combobox />
+            <Combobox
+              HyperLinkPublicKey={publicKey?.toString() ?? ""}
+              onTokenSelect={setSelectedToken}
+            />
           </div>
           <div className="flex w-full items-center text-gray-500 justify-center text-left text-sm font-normal text-grey-700 xs:text-base">
             <span className="text-sm font-semibold text-grey-700 ">
@@ -134,6 +176,11 @@ export default function ExternalWalletTab({
                 {loading || isTransferring ? <BouncingDotsLoader /> : "Deposit"}
               </Button>
             </div>
+            {transferredAmount !== null && (
+              <p className="mt-2 text-sm text-gray-600">
+                Actual amount transferred: ${transferredAmount.toFixed(2)} USD
+              </p>
+            )}
           </div>
         </div>
       </div>

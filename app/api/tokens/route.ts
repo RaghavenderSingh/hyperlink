@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { TokenWithBalance, TokenDetails } from '@/lib/types';
 import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import axios from 'axios';
 
 // Static list of tokens for Solana devnet
 const STATIC_TOKENS: TokenDetails[] = [
@@ -11,7 +12,6 @@ const STATIC_TOKENS: TokenDetails[] = [
         symbol: "SOL",
         decimals: 9,
         logoURI: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png",
-        price: "20", // Example price, update as needed
         native: true
     },
     {
@@ -20,7 +20,6 @@ const STATIC_TOKENS: TokenDetails[] = [
         symbol: "USDC",
         decimals: 6,
         logoURI: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png",
-        price: "1", // Stablecoin, so price is 1
         native: false
     },
     {
@@ -29,12 +28,22 @@ const STATIC_TOKENS: TokenDetails[] = [
         symbol: "USDT",
         decimals: 6,
         logoURI: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB/logo.svg",
-        price: "1", // Stablecoin, so price is 1
         native: false
     }
 ];
 
 const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
+
+async function getSolanaPrice(): Promise<number> {
+    try {
+        const response = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd');
+        return response.data.solana.usd;
+    } catch (error) {
+        console.error('Error fetching Solana price:', error);
+        // Return a default price if the API call fails
+        return 20; // You might want to adjust this default value
+    }
+}
 
 async function getAccountBalances(address: string): Promise<Map<string, number>> {
     const pubkey = new PublicKey(address);
@@ -74,19 +83,26 @@ export async function GET(req: NextRequest) {
 
     try {
         const balances = await getAccountBalances(address);
+        const solPrice = await getSolanaPrice();
 
-        const tokensWithBalances: TokenWithBalance[] = STATIC_TOKENS
-            .map(token => {
-                const balance = token.native
-                    ? balances.get(token.mint) || 0
-                    : balances.get(token.mint) || 0;
-                const usdBalance = (balance * Number(token.price || 0)).toFixed(2);
-                return {
-                    ...token,
-                    balance: balance.toFixed(token.decimals),
-                    usdBalance
-                };
-            });
+        const tokensWithBalances: TokenWithBalance[] = await Promise.all(STATIC_TOKENS.map(async (token) => {
+            const balance = token.native
+                ? balances.get(token.mint) || 0
+                : balances.get(token.mint) || 0;
+
+            let price = 1; // Default price for stablecoins
+            if (token.symbol === 'SOL') {
+                price = solPrice;
+            }
+
+            const usdBalance = (balance * price).toFixed(2);
+            return {
+                ...token,
+                balance: balance.toFixed(token.decimals),
+                usdBalance,
+                price: price.toString()
+            };
+        }));
 
         const totalBalance = tokensWithBalances.reduce((acc, val) => acc + Number(val.usdBalance), 0).toFixed(2);
 

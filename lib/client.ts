@@ -1,17 +1,16 @@
-import { Connection, PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { Connection, PublicKey, LAMPORTS_PER_SOL, Transaction, SystemProgram, sendAndConfirmTransaction, Keypair } from "@solana/web3.js";
 import { web3auth } from "./web3auth"; // Adjust the import path as needed
 
 let connection: Connection | null = null;
 let publicKey: PublicKey | null = null;
 
-// Solana devnet RPC endpoint
-const SOLANA_RPC_ENDPOINT = `https://rpc.ironforge.network/${process.env.NEXT_PUBLIC_SOLANA_ENVIRONMENT}?apiKey=${process.env.NEXT_PUBLIC_IRONFORGE_API_KEY}`;
+// Updated Solana devnet RPC endpoint
+const SOLANA_RPC_ENDPOINT = "https://api.devnet.solana.com";
 
 export function initClients() {
   if (typeof window !== "undefined" && web3auth.provider) {
     connection = new Connection(SOLANA_RPC_ENDPOINT);
 
-    // Updated to handle the unknown type and check if it's an array of strings
     web3auth.provider.request({ method: "getAccounts" }).then((accounts: unknown) => {
       if (Array.isArray(accounts) && accounts.length > 0 && typeof accounts[0] === 'string') {
         publicKey = new PublicKey(accounts[0]);
@@ -57,21 +56,42 @@ export async function sendTransaction(from: PublicKey, to: string, amount: numbe
 
   const transaction = await createTransferTransaction(from, to, amount);
 
-  // Sign and send the transaction using Web3Auth provider
-  const signedTransaction = await web3auth.provider.request({
-    method: "signAndSendTransaction",
-    params: {
-      message: transaction.serializeMessage().toString('hex'),
-    },
-  });
+  try {
+    // Get the private key from Web3Auth
+    const privateKeyHex = await web3auth.provider.request({
+      method: "solanaPrivateKey"
+    }) as string;
 
-  return signedTransaction;
+    if (!privateKeyHex) throw new Error("Failed to get private key from Web3Auth");
+
+    // Convert the hex string to Uint8Array
+    const privateKeyUint8 = new Uint8Array(Buffer.from(privateKeyHex, 'hex'));
+
+    // Create a Solana keypair from the private key
+    const keypair = Keypair.fromSecretKey(privateKeyUint8);
+
+    // Sign and send the transaction
+    const signature = await sendAndConfirmTransaction(
+      connection,
+      transaction,
+      [keypair]
+    );
+
+    return signature;
+  } catch (error) {
+    console.error("Transaction error:", error);
+    if (error instanceof Error) {
+      console.error("Error name:", error.name);
+      console.error("Error message:", error.message);
+      console.error("Error stack:", error.stack);
+    }
+    throw error;
+  }
 }
+
 
 async function createTransferTransaction(from: PublicKey, to: string, amount: number) {
   if (!connection) throw new Error("Connection not initialized");
-
-  const { Transaction, SystemProgram } = await import("@solana/web3.js");
 
   const transaction = new Transaction().add(
     SystemProgram.transfer({
@@ -81,8 +101,9 @@ async function createTransferTransaction(from: PublicKey, to: string, amount: nu
     })
   );
 
-  const { blockhash } = await connection.getRecentBlockhash();
+  const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
   transaction.recentBlockhash = blockhash;
+  transaction.lastValidBlockHeight = lastValidBlockHeight;
   transaction.feePayer = from;
 
   return transaction;

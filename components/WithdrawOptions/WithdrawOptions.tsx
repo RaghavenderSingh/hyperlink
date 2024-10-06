@@ -1,26 +1,34 @@
-import React from "react";
+import React, { useState } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import ConnectedWallet from "./ConnectedWallet";
 import GroupButton from "../GroupButton";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-interface FundingOptionsProps {
+
+interface WithdrawOptionsProps {
   HyperLinkPublicKey: string | null;
 }
+
 export default function WithdrawOptions({
   HyperLinkPublicKey,
-}: FundingOptionsProps) {
+}: WithdrawOptionsProps) {
   const { wallet } = useWallet();
-  console.log(wallet);
+  const [displayExternalWallet, setDisplayExternalWallet] =
+    useState<string>("");
+
+  if (
+    displayExternalWallet === "connectedWallet" ||
+    displayExternalWallet === "externalWallet"
+  ) {
+    return (
+      <ConnectedWallet
+        HyperLinkPublicKey={HyperLinkPublicKey}
+        setDisplayExternalWallet={setDisplayExternalWallet}
+        displayExternalWallet={displayExternalWallet}
+      />
+    );
+  }
+
   return (
-    <div
-      className="mx-auto mt-4 flex-col items-center space-y-2 rounded-xl border border-white bg-white/50 p-[20px] text-center sm:px-[40px] sm:py-[32px] mid:w-[803px]"
-      style={{
-        boxShadow:
-          "rgba(0, 0, 0, 0.06) 0px 4px 40px, rgba(255, 255, 255, 0.8) 0px 0px 40px inset",
-        borderRadius: "12px",
-        opacity: 1,
-        overflow: "unset",
-        transition: "ease-out",
-      }}
-    >
+    <div className="mx-auto mt-4 flex-col items-center space-y-2 rounded-xl border border-white bg-white/50 p-[20px] text-center sm:px-[40px] sm:py-[32px] mid:w-[803px]">
       <div className="flex-col">
         <h4 className="mb-3 flex w-full items-center justify-start text-left text-lg font-bold text-grey-800 xs:text-[26px]">
           Withdraw
@@ -30,8 +38,9 @@ export default function WithdrawOptions({
             icon={
               <img src={wallet?.adapter.icon} alt="sol" className="h-5 w-5" />
             }
-            title="To External Account/Wallet"
+            title="To Connected Wallet"
             description={`Asset will be sent to the ${wallet?.adapter.name} account.`}
+            onClick={() => setDisplayExternalWallet("connectedWallet")}
           />
           <GroupButton
             icon={
@@ -60,9 +69,9 @@ export default function WithdrawOptions({
                 </svg>
               </div>
             }
-            title="To Solana Wallet Address"
+            title="To External Solana Wallet"
             description="Assets will be sent to a Solana wallet address you specify."
-            onClick={() => {}}
+            onClick={() => setDisplayExternalWallet("externalWallet")}
           />
         </div>
       </div>
