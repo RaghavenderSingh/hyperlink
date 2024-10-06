@@ -95,7 +95,10 @@ function FundingOptions({ HyperLinkPublicKey }: FundingOptionsProps) {
         </div>
       ) : (
         <>
-          <ExternalWalletTab />
+          <ExternalWalletTab
+            HyperLinkPublicKey={HyperLinkPublicKey}
+            setShowExternalWallet={setShowExternalWallet}
+          />
         </>
       )}
     </div>

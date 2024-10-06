@@ -7,13 +7,25 @@ import BouncingDotsLoader from "../BouncingDotsLoader";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { ArrowLeft } from "lucide-react";
 import { Combobox } from "../Combobox";
+import { convertUsdToSol } from "@/lib/KeyStore";
+import { useTransferSOL } from "@/app/hooks/useTransferSOL";
 
-export default function ExternalWalletTab() {
+interface FundingOptionsProps {
+  HyperLinkPublicKey: string | null;
+  setShowExternalWallet: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export default function ExternalWalletTab({
+  HyperLinkPublicKey,
+  setShowExternalWallet,
+}: FundingOptionsProps) {
   const [amount, setAmount] = useState("");
   const { publicKey } = useWallet();
   const [balance, setBalance] = useState(0);
   const { connection } = useConnection();
   const [loading, setLoading] = useState(false);
+  const { transferSOL, isTransferring, error } = useTransferSOL();
+
   useEffect(() => {
     if (!connection || !publicKey) {
       return;
@@ -34,11 +46,47 @@ export default function ExternalWalletTab() {
       setBalance(info.lamports / LAMPORTS_PER_SOL);
     });
   }, [connection, publicKey]);
+
+  const handleDeposit = async () => {
+    if (!HyperLinkPublicKey) {
+      console.error("HyperLinkPublicKey is null");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const amtInSolString = await convertUsdToSol(amount);
+      const amtInSol = parseFloat(amtInSolString);
+
+      if (isNaN(amtInSol)) {
+        throw new Error("Invalid SOL amount");
+      }
+
+      const amtInLamports = Math.round(amtInSol * LAMPORTS_PER_SOL);
+      await transferSOL(HyperLinkPublicKey, amtInLamports);
+
+      if (error) {
+        console.error("Transfer error:", error);
+        // Handle error, maybe show it to the user
+      } else {
+        console.log("Transfer successful");
+        // Maybe update UI to show success
+      }
+    } catch (err) {
+      console.error("Deposit error:", err);
+      // Handle error, maybe show it to the user
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div>
       <div className="py-5">
         <div
-          onClick={() => {}}
+          onClick={() => {
+            setShowExternalWallet(false);
+          }}
           className="mb-3.5 mr-auto text-gray-500 flex w-max cursor-pointer items-center justify-start gap-1 text-sm font-semibold text-grey-700 hover:opacity-70"
         >
           <span>
@@ -72,9 +120,18 @@ export default function ExternalWalletTab() {
               <CustomTextField amount={amount} setAmount={setAmount} />
             </div>
             <div className="flex justify-between mt-4">
-              <Button onClick={() => {}}>Cancel</Button>
-              <Button disabled={loading} onClick={() => {}}>
-                {loading ? <BouncingDotsLoader /> : "Deposit"}
+              <Button
+                onClick={() => {
+                  setShowExternalWallet(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                disabled={loading || isTransferring}
+                onClick={handleDeposit}
+              >
+                {loading || isTransferring ? <BouncingDotsLoader /> : "Deposit"}
               </Button>
             </div>
           </div>

@@ -22,15 +22,8 @@ const LoginAppbar: React.FC<UserInfoProps> = ({ session }) => {
           <Logo />
         </div>
         <div className="flex items-center">
-          <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-white p-2 shadow-[0_0_40px_rgba(0,0,0,0.06)] hover:bg-blue-25">
-            <img
-              alt="user avatar"
-              className="rounded-full border border-[#E0E7EB] h-[30px] w-[30px]"
-              src={
-                session?.user?.image || "https://example.com/default-avatar.png"
-              }
-              draggable="false"
-            />
+          <div className="flex items-center justify-center ">
+            <UserActionPanel session={session} />
           </div>
         </div>
       </div>

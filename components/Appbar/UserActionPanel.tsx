@@ -23,24 +23,26 @@ export default function UserActionPanel({
 }) {
   return (
     <Sheet>
-      <SheetTrigger>
-        <div className="flex items-center justify-between gap-2 p-1 px-5 rounded-lg border border-black">
-          <div className="flex items-center justify-center gap-2">
-            <div className="relative flex select-none items-center justify-center">
-              <Image
-                width={30}
-                height={30}
-                alt="user avatar"
-                className="rounded-full border border-[#E0E7EB] mr-1 h-9 w-9 mobile:mr-2 mobile:h-[30px] mobile:w-[30px] mobile:min-w-[30px] mobile:max-w-[30px]"
-                src={session?.user?.image || "https://via.placeholder.com/30"}
-                draggable="false"
-              />
+      <SheetTrigger className="w-full">
+        <div className="flex items-center justify-between w-full p-1 px-2 sm:px-5 rounded-lg border border-gray-400">
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-2">
+              <div className="relative flex select-none items-center justify-center">
+                <Image
+                  width={30}
+                  height={30}
+                  alt="user avatar"
+                  className="rounded-full border border-[#E0E7EB] h-7 w-7 sm:h-9 sm:w-9 min-w-[28px] sm:min-w-[36px]"
+                  src={session?.user?.image || "https://via.placeholder.com/30"}
+                  draggable="false"
+                />
+              </div>
             </div>
-            <Menu size={20} />
+            <Menu size={16} className="sm:w-5 sm:h-5" />
           </div>
         </div>
       </SheetTrigger>
-      <SheetContent className="!p-0 flex flex-col h-full">
+      <SheetContent className="!p-0 flex flex-col h-full w-full sm:max-w-md">
         <div className="flex-shrink-0">
           <div className="w-max px-5 py-4">
             <Logo />
