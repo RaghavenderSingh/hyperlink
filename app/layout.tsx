@@ -4,6 +4,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 import NextTopLoader from "nextjs-toploader";
 import AppWalletProvider from "@/components/WalletProvider";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "HyperLink",
@@ -22,6 +23,7 @@ export default function RootLayout({
           {" "}
           <NextTopLoader color="#333" />
           {children}
+          <Toaster />
         </AppWalletProvider>
       </body>
     </html>
