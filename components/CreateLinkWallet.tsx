@@ -13,7 +13,7 @@ import ConnectOptionsButton from "./ui/ConnectOptionsButton";
 import { Card } from "./ui/card";
 
 import { Button } from "./ui/button";
-import { useRouter } from "next/navigation";
+
 import LinkPopup from "./LinkPopup";
 import { convertUsdToSol } from "@/lib/KeyStore";
 import BouncingDotsLoader from "./BouncingDotsLoader";
