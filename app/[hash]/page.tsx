@@ -45,7 +45,7 @@ interface HyperLinkData {
 
 const HyperLinkCard: React.FC = () => {
   const [hyperlink, setHyperlink] = useState<HyperLinkData | null>(null);
-  const [balance, setBalance] = useState<number | null>(null);
+  const [balance, setBalance] = useState<number | null>(0);
   const [usdBalance, setUsdBalance] = useState<number | null>(null);
   const [error, setError] = useState<string>("");
   const [url, setUrl] = useState<URL>(new URL(window.location.href));
@@ -64,6 +64,7 @@ const HyperLinkCard: React.FC = () => {
   const loadHyperLink = async () => {
     const hash = window.location.hash.slice(1);
     setUrl(new URL(window.location.href));
+
     if (hash) {
       const url = `${process.env.NEXT_PUBLIC_HYPERLINK_ORIGIN}#${hash}`;
       try {
@@ -83,10 +84,11 @@ const HyperLinkCard: React.FC = () => {
         "https://api.devnet.solana.com",
         "confirmed"
       );
-      const balance = await connection.getBalance(
+      const balanc = await connection.getBalance(
         hyperlinkInstance.keypair.publicKey
       );
-      const solBalance = balance / LAMPORTS_PER_SOL;
+      const solBalance = balanc / LAMPORTS_PER_SOL;
+      console.log("12", balanc);
       setBalance(solBalance);
       const response = await fetch(
         "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd"
@@ -382,6 +384,7 @@ const HyperLinkCard: React.FC = () => {
   //     </Card>
   //   );
   // }
+  console.log(balance);
   const truncateUrl = (urlString: string, length: number = 16) => {
     if (urlString.length <= length) return urlString;
     return urlString.substring(0, length) + "...";
@@ -439,7 +442,9 @@ const HyperLinkCard: React.FC = () => {
             {balance !== null && (
               <div
                 className="rounded-xl shadow-lg p-6 flex flex-row justify-between"
-                style={{ backgroundImage: `url(${background.src})` }}
+                style={{
+                  backgroundImage: `url(./assets/images/images/background.jpg)`,
+                }}
               >
                 <div className="flex flex-col items-start">
                   <div className="mt-10">

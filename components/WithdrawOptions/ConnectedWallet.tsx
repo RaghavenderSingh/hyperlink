@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import CustomTextField from "../InputComponent";
 import { Button } from "../ui/button";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import BouncingDotsLoader from "../BouncingDotsLoader";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { ArrowLeft } from "lucide-react";
@@ -17,6 +17,7 @@ import {
   getBalance,
 } from "@/lib/client";
 import { Input } from "../ui/input";
+import { HyperLink } from "@/lib/url";
 
 interface FundingOptionsProps {
   HyperLinkPublicKey: string | null;
@@ -38,13 +39,15 @@ export default function ConnectedWallet({
   displayExternalWallet,
 }: FundingOptionsProps) {
   const [amount, setAmount] = useState("");
-  const { publicKey } = useWallet();
+  const { publicKey, connected } = useWallet();
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(false);
   const { isTransferring, error } = useTransferSOL();
   const [selectedToken, setSelectedToken] = useState<Token | null>(null);
   const [externalWalletAddress, setExternalWalletAddress] = useState("");
   const [isValidExternalAddress, setIsValidExternalAddress] = useState(false);
+  const [generatedHyperLink, setGeneratedHyperLink] =
+    useState<HyperLink | null>(null);
 
   useEffect(() => {
     initClients();
@@ -100,26 +103,54 @@ export default function ConnectedWallet({
   };
 
   const handleWithdrawal = async () => {
-    if (!publicKey) {
-      toast.error("User wallet not connected");
-      return;
+    console.log("Attempting withdrawal...");
+    console.log("Wallet connected:", connected);
+    console.log("Public key:", publicKey?.toString());
+
+    let destinationAddress: string;
+    let isHyperLink = false;
+    let link = new URL("");
+    if (displayExternalWallet === "Hyperlink") {
+      try {
+        // Create a new HyperLink
+        const newHyperLink = await HyperLink.create();
+        setGeneratedHyperLink(newHyperLink);
+        destinationAddress = newHyperLink.keypair.publicKey.toString();
+        isHyperLink = true;
+        console.log(
+          "HyperLink created successfully:",
+          destinationAddress,
+          newHyperLink
+        );
+        console.log("HyperLink created successfully:", destinationAddress);
+
+        // Open the HyperLink in a new window
+        const hyperLinkUrl = newHyperLink.url; // Assuming the HyperLink object has a url property
+        link = hyperLinkUrl;
+      } catch (error) {
+        console.error("Error creating HyperLink:", error);
+        toast.error("Failed to create HyperLink");
+        return;
+      }
+    } else if (displayExternalWallet === "externalWallet") {
+      if (!isValidExternalAddress) {
+        toast.error("Invalid external wallet address");
+        return;
+      }
+      destinationAddress = externalWalletAddress;
+    } else {
+      // This is the case where we're withdrawing to the user's own wallet
+      if (!connected || !publicKey) {
+        console.error("Wallet not connected or public key not available");
+        toast.error(
+          "User wallet not connected. Please connect your wallet first."
+        );
+        return;
+      }
+      destinationAddress = publicKey.toString();
     }
 
-    const destinationAddress =
-      displayExternalWallet === "externalWallet"
-        ? externalWalletAddress
-        : publicKey.toString();
-
-    if (!destinationAddress) {
-      toast.error("Destination wallet address not set");
-      return;
-    }
-
-    if (displayExternalWallet === "externalWallet" && !isValidExternalAddress) {
-      toast.error("Invalid external wallet address");
-      return;
-    }
-
+    // Now that we have a destination address, we can proceed with the withdrawal
     setLoading(true);
     try {
       const amtInSolString = await convertUsdToSol(amount);
@@ -149,11 +180,25 @@ export default function ConnectedWallet({
         destinationAddress,
         amtInLamports
       );
-
+      window.open(link, "_blank", "noopener,noreferrer");
       console.log(
         "Withdrawal transaction sent successfully. Signature:",
         signature
       );
+
+      if (isHyperLink && generatedHyperLink) {
+        console.log(
+          "Generated HyperLink URL:",
+          generatedHyperLink.url.toString()
+        );
+        toast.success(
+          `HyperLink created: ${generatedHyperLink.url.toString()}`,
+          {
+            duration: 10000,
+            position: "top-center",
+          }
+        );
+      }
 
       toast.success("Withdrawal successful!", {
         duration: 5000,

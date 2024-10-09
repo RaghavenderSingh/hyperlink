@@ -90,7 +90,7 @@ const WalletOverview: React.FC<WalletOverviewProps> = ({
                 height={68}
               />
               <p className="text-lg font-bold text-gray-800 sm:text-[26px]">
-                Welcome back, {session?.user?.name}!
+                Welcome, {session?.user?.name}!
               </p>
             </div>
           </h3>
