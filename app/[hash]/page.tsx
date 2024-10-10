@@ -1,24 +1,20 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Connection,
   PublicKey,
   LAMPORTS_PER_SOL,
   Transaction,
   SystemProgram,
-  Keypair,
   sendAndConfirmTransaction,
 } from "@solana/web3.js";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import background from "../../public/assets/images/images/background.jpg";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  ArrowLeft,
   Bookmark,
   ChevronRight,
   Copy,
-  Loader,
   QrCodeIcon,
   Wallet,
 } from "lucide-react";
@@ -47,21 +43,16 @@ const HyperLinkCard: React.FC = () => {
   const [hyperlink, setHyperlink] = useState<HyperLinkData | null>(null);
   const [balance, setBalance] = useState<number | null>(0);
   const [usdBalance, setUsdBalance] = useState<number | null>(null);
-  const [error, setError] = useState<string>("");
   const [url, setUrl] = useState<URL>(new URL(window.location.href));
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showQrModal, setShowQrModal] = useState<boolean>(false);
-  const [step, setStep] = useState<Number>(0);
+  const [step, setStep] = useState<number>(0);
   const [transferAmount, setTransferAmount] = useState<string>("");
   const [recipentPublicKey, setRecipentPublicKey] = useState<string>("");
 
-  const { publicKey, connected } = useWallet();
+  const { publicKey } = useWallet();
 
-  useEffect(() => {
-    loadHyperLink();
-  }, [isLoading]);
-
-  const loadHyperLink = async () => {
+  const loadHyperLink = useCallback(async () => {
     const hash = window.location.hash.slice(1);
     setUrl(new URL(window.location.href));
 
@@ -71,11 +62,17 @@ const HyperLinkCard: React.FC = () => {
         const hyperlinkInstance = await HyperLink.fromLink(url);
         setHyperlink(hyperlinkInstance);
         await fetchBalance(hyperlinkInstance);
-      } catch (err) {
-        setError("Invalid HyperLink");
+      } catch (error) {
+        console.error("Invalid HyperLink:", error);
+        // Handle error state if needed
       }
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadHyperLink();
+  }, [loadHyperLink, isLoading]);
+
   const fetchBalance = async (
     hyperlinkInstance: HyperLinkData
   ): Promise<void> => {
@@ -95,9 +92,9 @@ const HyperLinkCard: React.FC = () => {
       );
       const data: { solana: { usd: number } } = await response.json();
       setUsdBalance(solBalance * data.solana.usd);
-    } catch (err) {
-      console.error("Error fetching balance:", err);
-      setError("Error fetching balance.");
+    } catch (error) {
+      console.error("Error fetching balance:", error);
+      // Handle error state if needed
     }
   };
 
@@ -107,8 +104,8 @@ const HyperLinkCard: React.FC = () => {
   };
 
   const handleBookmark = () => {
-    if ((window as any).external && (window as any).external.AddFavorite) {
-      (window as any).external.AddFavorite(window.location.href, "HyperLink");
+    if ("AddFavorite" in window) {
+      (window as any).AddFavorite(window.location.href, "HyperLink");
     } else {
       toast(
         `Press ${
@@ -117,9 +114,10 @@ const HyperLinkCard: React.FC = () => {
       );
     }
   };
+
   const completeAmount = async () => {
     if (!hyperlink) {
-      setError("No HyperLink available to transfer from.");
+      console.error("No HyperLink available to transfer from.");
       return;
     }
     const connection = new Connection(
@@ -131,9 +129,10 @@ const HyperLinkCard: React.FC = () => {
     );
     createLinkAndTransfer({ amount: currentBalance });
   };
+
   const handleTransferAmount = async () => {
     if (!hyperlink) {
-      setError("No HyperLink available to transfer from.");
+      console.error("No HyperLink available to transfer from.");
       return;
     }
     const amt = await convertUsdToSol(transferAmount);
@@ -143,7 +142,7 @@ const HyperLinkCard: React.FC = () => {
 
   const createLinkAndTransfer = async ({ amount }: { amount: number }) => {
     if (!hyperlink) {
-      setError("No HyperLink available to transfer from.");
+      console.error("No HyperLink available to transfer from.");
       return;
     }
 
@@ -178,17 +177,11 @@ const HyperLinkCard: React.FC = () => {
       const signature = await connection.sendRawTransaction(
         transaction.serialize()
       );
-      const confirmation = await connection.confirmTransaction({
+      await connection.confirmTransaction({
         signature,
         blockhash,
         lastValidBlockHeight,
       });
-
-      if (confirmation.value.err) {
-        throw new Error(
-          `Transaction failed: ${confirmation.value.err.toString()}`
-        );
-      }
 
       setHyperlink(newHyperlink);
       await fetchBalance(hyperlink);
@@ -197,11 +190,12 @@ const HyperLinkCard: React.FC = () => {
       window.open(newHyperlink.url.toString(), "_blank");
       console.log("newHyperlink", newHyperlink);
       setIsLoading(false);
-    } catch (err) {
-      console.error("Error:", err);
-      setError(`Error creating new HyperLink or transferring funds: ${err}`);
+    } catch (error) {
+      console.error("Error:", error);
+      // Handle error state if needed
     }
   };
+
   const handleTransferToPublickkey = async () => {
     console.log(recipentPublicKey, transferAmount);
     if (!recipentPublicKey || transferAmount === "") {
@@ -210,16 +204,18 @@ const HyperLinkCard: React.FC = () => {
     }
     try {
       const publicKey = new PublicKey(recipentPublicKey);
-      publicKey.toBytes().length === 32;
+      if (publicKey.toBytes().length !== 32) {
+        throw new Error("Invalid public key length");
+      }
       const amt = await convertUsdToSol(transferAmount);
       const amount = Number(amt) * LAMPORTS_PER_SOL;
       console.log(publicKey, amount, transferAmount);
       handleTransfer(publicKey, amount);
     } catch (error) {
       toast.error("Invalid public key");
-      return false;
     }
   };
+
   const handleTransferToPersonalWallet = async () => {
     if (!publicKey || !balance || !hyperlink) {
       toast.error("Missing required information for transfer.");
@@ -228,6 +224,7 @@ const HyperLinkCard: React.FC = () => {
     const amount = balance * LAMPORTS_PER_SOL;
     handleTransfer(publicKey, amount);
   };
+
   const handleTransfer = async (publicKey: PublicKey, amount: number) => {
     if (!publicKey || !balance || !hyperlink) {
       toast.error("Missing required information for transfer.");
@@ -277,7 +274,7 @@ const HyperLinkCard: React.FC = () => {
     }
   };
 
-  const handleSteps = (step: Number) => {
+  const handleSteps = (step: number) => {
     switch (step) {
       case 0:
         return (
@@ -300,7 +297,7 @@ const HyperLinkCard: React.FC = () => {
               </div>
               {isLoading ? <Spinner /> : <ChevronRight />}
             </Button>
-            <Button //TODO
+            <Button
               onClick={handleTransferToPersonalWallet}
               className="flex justify-between text-base font-medium p-10 xs:w-full xs:text-base"
             >
@@ -331,7 +328,7 @@ const HyperLinkCard: React.FC = () => {
             />
             <Button
               className="mt-1 w-full"
-              disabled={transferAmount === "" ? true : false}
+              disabled={transferAmount === ""}
               onClick={() => handleTransferAmount()}
             >
               Send
@@ -355,7 +352,7 @@ const HyperLinkCard: React.FC = () => {
             />
             <Button
               className="mt-1 w-full"
-              disabled={transferAmount === "" ? true : false}
+              disabled={transferAmount === ""}
               onClick={() => handleTransferToPublickkey()}
             >
               Send
@@ -365,25 +362,6 @@ const HyperLinkCard: React.FC = () => {
     }
   };
 
-  // if (error) {
-  //   return (
-  //     <Card className="w-full max-w-md mx-auto my-auto">
-  //       <CardContent className="pt-6">
-  //         <p className="text-red-500 text-center">{error}</p>
-  //       </CardContent>
-  //     </Card>
-  //   );
-  // }
-
-  // if (!hyperlink) {
-  //   return (
-  //     <Card className="w-full max-w-md mx-auto">
-  //       <CardContent className="pt-6">
-  //         <p className="text-center">Loading HyperLink...</p>
-  //       </CardContent>
-  //     </Card>
-  //   );
-  // }
   console.log(balance);
   const truncateUrl = (urlString: string, length: number = 16) => {
     if (urlString.length <= length) return urlString;
