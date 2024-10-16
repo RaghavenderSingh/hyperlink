@@ -24,9 +24,6 @@ export function Swap({
   const [fetchingQuote, setFetchingQuote] = useState(false);
   const [quoteResponse, setQuoteResponse] = useState(null);
 
-  // TODO: Use async useEffects that u can cancel
-  // Use debouncing
-
   useEffect(() => {
     setBaseAsset(tokens?.[0]);
     setQuoteAsset(tokens?.[1]);
