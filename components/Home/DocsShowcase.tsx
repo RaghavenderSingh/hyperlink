@@ -29,11 +29,11 @@ const DocsShowcase = () => {
           </div>
           <div className="hidden md:flex items-end justify-end pl-3 pt-3 pb-3 md:pb-0 rounded-lg rounded-r-none md:rounded-b-none bg-zinc-950 backdrop:blur-sm shadow-inner shadow-white/60 h-fit">
             <Image
-              src="https://res.cloudinary.com/dtc9ysbnn/image/upload/v1723236913/api_uab9ko.png"
+              src="/assets/images/images/code.png"
               alt="api image"
               width={450}
               height={300}
-              className="overflow-hidden items-end "
+              className="overflow-hidden items-end rounded-lg"
             />
           </div>
         </div>
