@@ -16,6 +16,7 @@ import { Card, CardContent } from "../ui/card";
 import Image from "next/image";
 import FundingOptions from "../AddFunds/FundingOptions";
 import WithdrawOptions from "../WithdrawOptions/WithdrawOptions";
+import { Swap } from "../Swap/swap";
 
 interface WalletOverviewProps {
   totalBalanceUSD: number;
@@ -51,7 +52,9 @@ const WalletOverview: React.FC<WalletOverviewProps> = ({
           </div>
         );
       case "swap":
-        return <div>Swap Content</div>;
+        return (
+          <div>{/* <Swap tokenBalances={tokenBalances,tokenBalances}/> */}</div>
+        );
       default:
         return null;
     }
