@@ -109,7 +109,8 @@ export default function ConnectedWallet({
 
     let destinationAddress: string;
     let isHyperLink = false;
-    let link = new URL("");
+    let hyperLinkUrl: URL | null = null;
+
     if (displayExternalWallet === "Hyperlink") {
       try {
         // Create a new HyperLink
@@ -117,16 +118,27 @@ export default function ConnectedWallet({
         setGeneratedHyperLink(newHyperLink);
         destinationAddress = newHyperLink.keypair.publicKey.toString();
         isHyperLink = true;
+
+        // Safely construct the URL
+        try {
+          // Assuming the HyperLink URL is a valid URL string
+          // Add a base URL if the HyperLink.url doesn't include one
+          const urlString = newHyperLink.url.toString();
+          if (!urlString.startsWith("http")) {
+            hyperLinkUrl = new URL(`https://${urlString}`);
+          } else {
+            hyperLinkUrl = new URL(urlString);
+          }
+        } catch (urlError) {
+          console.error("Error creating URL:", urlError);
+          // Continue with the transaction but log the URL error
+        }
+
         console.log(
           "HyperLink created successfully:",
           destinationAddress,
           newHyperLink
         );
-        console.log("HyperLink created successfully:", destinationAddress);
-
-        // Open the HyperLink in a new window
-        const hyperLinkUrl = newHyperLink.url; // Assuming the HyperLink object has a url property
-        link = hyperLinkUrl;
       } catch (error) {
         console.error("Error creating HyperLink:", error);
         toast.error("Failed to create HyperLink");
@@ -139,7 +151,6 @@ export default function ConnectedWallet({
       }
       destinationAddress = externalWalletAddress;
     } else {
-      // This is the case where we're withdrawing to the user's own wallet
       if (!connected || !publicKey) {
         console.error("Wallet not connected or public key not available");
         toast.error(
@@ -150,7 +161,6 @@ export default function ConnectedWallet({
       destinationAddress = publicKey.toString();
     }
 
-    // Now that we have a destination address, we can proceed with the withdrawal
     setLoading(true);
     try {
       const amtInSolString = await convertUsdToSol(amount);
@@ -159,15 +169,6 @@ export default function ConnectedWallet({
         throw new Error("Invalid SOL amount");
       }
       const amtInLamports = Math.round(amtInSol * LAMPORTS_PER_SOL);
-
-      console.log(
-        `Attempting to withdraw ${amtInSol} SOL (${amtInLamports} lamports)`
-      );
-      console.log(
-        `Current balance: ${balance} SOL (${
-          balance * LAMPORTS_PER_SOL
-        } lamports)`
-      );
 
       if (amtInLamports > balance * LAMPORTS_PER_SOL) {
         throw new Error(
@@ -180,24 +181,26 @@ export default function ConnectedWallet({
         destinationAddress,
         amtInLamports
       );
-      window.open(link, "_blank", "noopener,noreferrer");
+
+      // Only open the hyperlink if it was successfully created
+      if (hyperLinkUrl) {
+        window.open(hyperLinkUrl.toString(), "_blank", "noopener,noreferrer");
+      }
+
       console.log(
         "Withdrawal transaction sent successfully. Signature:",
         signature
       );
 
       if (isHyperLink && generatedHyperLink) {
-        console.log(
-          "Generated HyperLink URL:",
-          generatedHyperLink.url.toString()
-        );
-        toast.success(
-          `HyperLink created: ${generatedHyperLink.url.toString()}`,
-          {
-            duration: 10000,
-            position: "top-center",
-          }
-        );
+        const hyperLinkUrlString = hyperLinkUrl
+          ? hyperLinkUrl.toString()
+          : "URL not available";
+        console.log("Generated HyperLink URL:", hyperLinkUrlString);
+        toast.success(`HyperLink created: ${hyperLinkUrlString}`, {
+          duration: 10000,
+          position: "top-center",
+        });
       }
 
       toast.success("Withdrawal successful!", {
