@@ -25,13 +25,17 @@ export async function handleSignOut() {
       await web3auth.logout();
     }
 
-    // Clear Web3Auth-related items from local storage
-    localStorage.removeItem('openlogin_store');
-    localStorage.removeItem('Web3Auth-cachedAdapter');
-
-    // Clear any other custom tokens or data you might have stored
-    // For example:
-    // localStorage.removeItem('your_custom_token_key');
+    // Clear all Web3Auth-related items from local storage
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && (key.startsWith('openlogin_store') || 
+          key.startsWith('Web3Auth') || 
+          key.startsWith('w3a') ||
+          key.includes('wagmi') ||
+          key.includes('connectKit'))) {
+        localStorage.removeItem(key);
+      }
+    }
 
     await signOut({ redirect: false });
 
@@ -64,6 +68,11 @@ export async function initializeWeb3Auth() {
       console.log("Web3Auth initialized successfully");
     } catch (error) {
       console.error("Error initializing Web3Auth:", error);
+      if (error instanceof Error) {
+        console.error("Error name:", error.name);
+        console.error("Error message:", error.message);
+        console.error("Error stack:", error.stack);
+      }
       throw error;
     }
   } else {
