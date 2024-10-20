@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { format } from "date-fns";
-import { ChevronUp } from "lucide-react";
+import { ChevronUp, Plus, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface Transaction {
@@ -53,7 +53,7 @@ const ActivityTab = ({ publicKey }: { publicKey: string | null }) => {
 
     fetchTransactions();
   }, []);
-
+  console.log(transactions);
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const bottom =
       e.currentTarget.scrollHeight - e.currentTarget.scrollTop ===
@@ -116,18 +116,8 @@ const ActivityTab = ({ publicKey }: { publicKey: string | null }) => {
                         className="rounded-full"
                       />
                     </div>
-                    <div className="absolute -bottom-2 -right-2 flex h-6 w-6 items-start rounded-full border-2 border-white bg-grey-900 p-1 hover:border-blue-25">
-                      <Image
-                        src={
-                          transaction.type === "received"
-                            ? "/_next/static/media/plus-white.cafeac43.svg"
-                            : "/_next/static/media/plane-white.280a6aa9.svg"
-                        }
-                        alt="Transaction Action Icon"
-                        width={15}
-                        height={14}
-                        className="w-full"
-                      />
+                    <div className="absolute -bottom-2 -right-2 flex h-6 w-6 items-center justify-center bg-black text-white rounded-full border-2 border-white bg-grey-900 p-1 hover:border-blue-25">
+                      {transaction.type === "received" ? <Send /> : <Plus />}
                     </div>
                   </div>
                   <div className="ml-3 text-left">
