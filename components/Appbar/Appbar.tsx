@@ -162,7 +162,7 @@ const Appbar: React.FC = () => {
                   <ProductItem
                     title="HyperLink wallet"
                     description="The world's simplest wallet"
-                    href="#"
+                    href="/products/hyperlink-wallet-adapter"
                     icon={Wallet}
                   />
                   <ProductItem
