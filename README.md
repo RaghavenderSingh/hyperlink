@@ -2,6 +2,8 @@
 
 ## Overview
 
+<video src="public/videos/wallet.mov" width="100%" controls autoplay muted loop></video>
+
 This project consists of two main products designed for users interacting with the Solana blockchain:
 
 1. **Wallet Creation**: Users can create their own cryptocurrency wallet using Web3Auth, currently supporting only the Solana blockchain.
@@ -10,6 +12,8 @@ This project consists of two main products designed for users interacting with t
 ## Product 1: Wallet Creation
 
 ### Introduction
+
+<video src="public/videos/walletextension.mp4" width="100%" controls autoplay muted loop></video>
 
 This feature allows users to create a Solana wallet easily using Web3Auth. Web3Auth simplifies the onboarding process by abstracting away the complexity of key management, enabling users to create and manage their wallets without directly dealing with private keys. Importantly, this project is non-custodial, meaning private keys are never stored by the platform, ensuring that users have full control over their funds.
 
@@ -58,6 +62,8 @@ The **Torus Network** is the backbone of Web3Auth’s decentralized key manageme
 ## Product 2: Link-Based Crypto Sharing
 
 ### Introduction
+
+<video src="public/videos/linkwallet.mp4" width="100%" controls autoplay muted loop></video>
 
 This feature enables users to generate a link that contains a cryptographic keypair, allowing them to share cryptocurrency with others securely. The recipient of the link can access the funds associated with the keypair.
 
